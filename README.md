@@ -198,13 +198,6 @@ _PS sbt-dependency-manager obsoletes capabilities provided by sbt deliver-local 
 FAQ
 ---
 
-* I want to fetch artifacts, but SBT try to compile broken code. Process aborted with compilation error.
-
-```scala
-    sbt> set dependencyClasspathNarrow <<= dependencyClasspath in Compile
-    sbt> set dependencyClasspathWide <<= dependencyClasspath in Compile
-```
-
 Authors
 -------
 
