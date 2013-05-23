@@ -1,4 +1,4 @@
-sbt-dependency-manager [![Build Status](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager)
+sbt-dependency-manager [![Build Status](https://travis-ci.org/digimead/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager)
 ======================
 
 Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](https://github.com/sbt-android-mill/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple). Please, open `test` file
