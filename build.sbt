@@ -29,7 +29,8 @@ homepage := Some(url("https://github.com/digimead/sbt-dependency-manager"))
 
 version <<= (baseDirectory) { (b) => scala.io.Source.fromFile(b / "version").mkString.trim }
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit") // There is no "-Xfatal-warnings" because we have cross compilation against different Scala versions
+// There is no "-Xfatal-warnings" because we have cross compilation against different Scala versions
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit")
 
 // http://vanillajava.blogspot.ru/2012/02/using-java-7-to-target-much-older-jvms.html
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation", "-source", "1.6", "-target", "1.6")
