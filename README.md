@@ -39,7 +39,7 @@ Table of contents
 
 ## Adding to your project
 
-You may find sample project at [src/sbt-test/dependency-manager/simple](https://github.com/sbt-android-mill/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple)
+You may find sample project at [src/sbt-test/dependency-manager/simple](https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple)
 
 ### Via interactive build
 
