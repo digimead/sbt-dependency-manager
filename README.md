@@ -9,7 +9,7 @@ It is provide an ability:
 * to fetch __all dependency jars (include sbt-dependency-manager itself)__ to target folder
 * to fetch __all dependency jars with sources (include sbt-dependency-manager itself)__ to target folder
 * to fetch __all dependency jars with sources, merge them (include sbt-dependency-manager itself)__ and save to target folder
-* join all fetched artifacts to solid jar bundle, that simplify project setup and provide rapid develoment for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, OSGi bundles from P2 update sites and ivy/maven libraries :-)
+* join all fetched artifacts to solid jar bundle, that simplify project setup and provide rapid develoment dependency for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, OSGi bundles from P2 update sites and ivy/maven libraries :-)
 
 If you want to improve it, please send mail to sbt-android-mill at digimead.org. You will be added to the group. Please, feel free to add yourself to authors.
 
