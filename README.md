@@ -104,19 +104,13 @@ For _Build.scala_:
 By default aligned jars saved to _target/deps_ Change _dependenciesPath_ at your project to something like
 
 ``` scala
-    dependencyPath <<= (target in LocalRootProject) map { _ / "my-align-dir" }
-```
-
-or
-
-``` scala
     dependencyPath <<= (baseDirectory) (_ / "my-aling-dir")
 ```
 
 or
 
 ``` scala
-    DMKey.dependencyPath in DMConf <<= (baseDirectory) map (_ / "deps")
+    DMKey.dependencyPath in DMConf <<= (baseDirectory) (_ / "deps")
 ```
 
 ### Fetch all dependencies
@@ -179,7 +173,7 @@ It is very useful to develop simple-build-tool plugins. Most SBT source code are
 Internals
 ---------
 
-You may inspect all available parameters in [file with SBT keys](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/Keys.scala).
+You may inspect all available parameters in [Keys object](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/Keys.scala).
 
 ### Options ###
 
