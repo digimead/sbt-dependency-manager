@@ -104,13 +104,19 @@ For _Build.scala_:
 By default aligned jars saved to _target/deps_ Change _dependenciesPath_ at your project to something like
 
 ``` scala
-    dependenciesPath <<= (target in LocalRootProject) map { _ / "my-align-dir" }
+    dependencyPath <<= (target in LocalRootProject) map { _ / "my-align-dir" }
 ```
 
 or
 
 ``` scala
-    dependenciesPath <<= (baseDirectory) (_ / "my-aling-dir")
+    dependencyPath <<= (baseDirectory) (_ / "my-aling-dir")
+```
+
+or
+
+``` scala
+    DMKey.dependencyPath in DMConf <<= (baseDirectory) map (_ / "deps")
 ```
 
 ### Fetch all dependencies
@@ -186,15 +192,15 @@ You may inspect all available parameters in [file with SBT keys](https://github.
 * __lookup-classpath__ (dependencyLookupClasspath) - Classpath that is used for building the sequence of fetched dependencies.
 * __path__ (dependencyPath) - Target directory for dependency jars. [Example](#usage).
 * __resource-filter__ (dependencyResourceFilter) - Fuction for filtering jar content when we use `dependency-fetch-align`. [Example](#jar-entities-filter).
-* __skip-resolved__ (dependencySkipResolved) - Skip already resolved dependencies with explicit artifacts which points to local resources. For example dependencies which you add manually to your SBT project like "a" % "b" % "c" from file://bla/bla/...
+* __skip-resolved__ (dependencySkipResolved) - Skip already resolved dependencies with explicit artifacts which points to local resources. For example dependencies which you add manually to your SBT project like `"a" % "b" % "c" from file://bla/bla/...`
 
 ### Tasks ###
 
-* __dependency-bundle__ (dependencyTaskBundle) - Fetch dependency code and source jars. Save results to bundle.
-* __dependency-bundle-with-artifact__ (dependencyTaskBundleWithArtifact) - Fetch dependency code and source jars, add project artefact. Save results to bundle.
-* __dependency-fetch__ - Fetch project jars. Save result to target directory
-* __dependency-fetch-align__ - Fetch project jars, merge them with source code. Save result to target directory
-* __dependency-fetch-with-sources__ - Fetch project jars, fetch source jars. Save result to target directory
+* __dependency-bundle__ - Fetch dependency code and source jars. Save results to bundle.
+* __dependency-bundle-with-artifact__ - Fetch dependency code and source jars, add project artefact. Save results to bundle.
+* __dependency-fetch__ - Fetch project jars. Save result to target directory.
+* __dependency-fetch-align__ - Fetch project jars, merge them with source code. Save result to target directory.
+* __dependency-fetch-with-sources__ - Fetch project jars, fetch source jars. Save result to target directory.
 
 ### Other ###
 
