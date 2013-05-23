@@ -57,7 +57,7 @@ file that looks like the following:
     object PluginDef extends Build {
       override def projects = Seq(root)
       lazy val root = Project("plugins", file(".")) dependsOn(dm)
-      lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#0.6.4.1")
+      lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#0.6.4.2")
     }
 ```
 
@@ -67,7 +67,7 @@ You may find more information about Build.scala at [https://github.com/harrah/xs
 
 Supported SBT versions: 0.11.3, 0.12.3, 0.13.0-20130520-052156. Add to your _project/plugins.sbt_
 
-    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4.1")
+    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4.2")
 
 Maven repository:
 
