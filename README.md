@@ -135,7 +135,7 @@ For example I want to fetch all for one of my plugin all project dependecies and
         moduleFilter(organization = GlobFilter("com.typesafe.sbt")))))
 ```
 
-For more about module filters look at [SBT Wiki](https://github.com/harrah/xsbt/wiki/Update-Report)
+For more about module filters look at [SBT Wiki](http://www.scala-sbt.org/release/docs/Detailed-Topics/Update-Report#filter-basics)
 
 ### Jar entities filter
 
