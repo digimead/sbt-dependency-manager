@@ -1,7 +1,7 @@
 sbt-dependency-manager [![Build Status](https://travis-ci.org/digimead/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/digimead/sbt-dependency-manager)
 ======================
 
-Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple). Please, open `test` file
+Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple). Please, open `test` file.
 
 What is it? You may fetch [SBT](https://github.com/sbt/sbt "Simple Build Tool") project artifacts, compose jars with source code, align sources inside jars for your favorite IDE
 
@@ -57,7 +57,7 @@ file that looks like the following:
     object PluginDef extends Build {
       override def projects = Seq(root)
       lazy val root = Project("plugins", file(".")) dependsOn(dm)
-      lazy val dm = uri("git://github.com/sbt-android-mill/sbt-dependency-manager.git#0.6.1")
+      lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#0.6.4.1")
     }
 ```
 
@@ -67,7 +67,7 @@ You may find more information about Build.scala at [https://github.com/harrah/xs
 
 Supported SBT versions: 0.11.3, 0.12.3, 0.13.0-20130520-052156. Add to your _project/plugins.sbt_
 
-    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4")
+    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4.1")
 
 Maven repository:
 
@@ -87,7 +87,7 @@ For _build.sbt_, simply add:
 
 ``` scala
     import sbt.dependency.manager._
-    
+
     activateDependencyManager
 ```
 
@@ -95,7 +95,7 @@ For _Build.scala_:
 
 ``` scala
     import sbt.dependency.manager._
-    
+
     ... yourProjectSettings ++ activateDependencyManager
 ```
 
@@ -118,23 +118,36 @@ or
 By default sbt-dependency-manager skips "org.scala-lang" and "org.scala-sbt". If you need all dependencies do
 
 ``` scala
-    dependencyFilter := Seq()
+    dependencyFilter := None
 ```
 
 ### Filter dependencies
 
+For example I want to fetch all for one of my plugin all project dependecies and resources(jar + source code) of all artifacts with organizations org.scala-sbt, org.digimead, com.typesafe.sbt.
+
 ``` scala
-    dependencyFilter <<= (dependencyClasspathNarrow) map { cp =>
-      val filter1 = moduleFilter(organization = "org.scala-lang")
-      val filter2 = moduleFilter(organization = "org.other")
-      val filter3 = moduleFilter(organization = "com.blabla")
-      Some(cp.flatMap(_.get(moduleID.key)).filterNot(filter1).filterNot(filter2).filterNot(filter3))
-    },
-````
+    // common dependency filter
+    DMKey.dependencyFilter in DMConf <<= DMKey.dependencyFilter in DMConf map (df => df.map(df =>
+      // plus "org.scala-sbt" modules
+      moduleFilter(organization = GlobFilter("org.scala-sbt")) |
+        // plus project plugin modules
+        moduleFilter(organization = GlobFilter("org.digimead")) |
+        moduleFilter(organization = GlobFilter("com.typesafe.sbt")))))
+```
 
 For more about module filters look at [SBT Wiki](https://github.com/harrah/xsbt/wiki/Update-Report)
 
-### Align project dependencies ###
+### Jar entities filter
+
+You may filter jar artifacts from populated resources. For example default filter is
+
+    dependencyResourceFilter := resourceFilter
+    def resourceFilter(entry: ZipEntry): Boolean =
+      Seq("META-INF/.*\\.SF", "META-INF/.*\\.DSA", "META-INF/.*\\.RSA").find(entry.getName().toUpperCase().matches).nonEmpty
+
+So we are dropped all 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA' which absolutely unneeded while developing.
+
+### Align project dependencies
 
 1. Download all project __and SBT__ dependencies, sources, javadocs
 
@@ -156,24 +169,37 @@ It is very useful to develop simple-build-tool plugins. Most SBT source code are
 > set dependencyPath <<= baseDirectory map {(f) => f / "123" }
 > dependency-fetch-with-sources
 ```
- 
+
 Internals
 ---------
 
+You may inspect all available parameters in [file with SBT keys](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/Keys.scala).
+
 ### Options ###
 
-* __dependency-path__ (dependencyPath) - Target directory for dependency jars
-* __dependency-filter__ (dependencyFilter) - Processing dependencies only with particular sbt.ModuleID
-* __dependency-add-custom__ (dependencyAddCustom) - Add custom(unknown) libraries to results
-* __dependency-classpath-narrow__ (dependencyClasspathNarrow) - Union of dependencyClasspath from Compile and Test configurations
-* __dependency-classpath-wide__ (dependencyClasspathWide) - Union of fullClasspath from Compile and Test configurations
-* __dependency-ignore-configurations__ (dependencyIgnoreConfigurations) - Ignore configurations while lookup, 'test' for example
+* __add-custom__ (dependencyAddCustom) - Add custom(unknown) libraries to results.
+* __bundle-path__ (dependencyBundlePath) - Path to bundle with fetched artifacts.
+* __enable__ (dependencyEnable) - Enable/disable plugin. It is very usefull in nested project environments when parent project already provided all dependencies and child project inherits parent settings.
+* __enable-custom-libraries__ (dependencyEnableCustom) - Enables to fetch libraries that come from alternative sources like unmanaged artifacts or plugin specific library.
+* __filter__ (dependencyFilter) - Processing dependencies only with particular sbt.ModuleID. [Example](#filter-dependencies).
+* __ignore-configurations__ (dependencyIgnoreConfigurations) - Ignore configurations while lookup, 'test' for example.
+* __lookup-classpath__ (dependencyLookupClasspath) - Classpath that is used for building the sequence of fetched dependencies.
+* __path__ (dependencyPath) - Target directory for dependency jars. [Example](#usage).
+* __resource-filter__ (dependencyResourceFilter) - Fuction for filtering jar content when we use `dependency-fetch-align`. [Example](#jar-entities-filter).
+* __skip-resolved__ (dependencySkipResolved) - Skip already resolved dependencies with explicit artifacts which points to local resources. For example dependencies which you add manually to your SBT project like "a" % "b" % "c" from file://bla/bla/...
 
 ### Tasks ###
 
+* __dependency-bundle__ (dependencyTaskBundle) - Fetch dependency code and source jars. Save results to bundle.
+* __dependency-bundle-with-artifact__ (dependencyTaskBundleWithArtifact) - Fetch dependency code and source jars, add project artefact. Save results to bundle.
 * __dependency-fetch__ - Fetch project jars. Save result to target directory
 * __dependency-fetch-align__ - Fetch project jars, merge them with source code. Save result to target directory
 * __dependency-fetch-with-sources__ - Fetch project jars, fetch source jars. Save result to target directory
+
+### Other ###
+
+* __predefined-classpath-filter__ - Predefined filter that accept all modules in project classpath. It consists of a sequence of sbt.ModuleFilter that generated from project dependencies and grouped by logical OR.
+
 
 Demonstration
 -------------
