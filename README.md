@@ -198,7 +198,7 @@ You may inspect all available parameters in [Keys object](https://github.com/dig
 
 ### Other ###
 
-* __predefined-classpath-filter__ - Predefined filter that accept all modules in project classpath. It consists of a sequence of sbt.ModuleFilter that generated from project dependencies and grouped by logical OR.
+* __predefined-classpath-filter__ - Predefined filter that accepts all modules in project classpath. It consists of a sequence of sbt.ModuleFilter that generated from project dependencies and grouped by logical OR.
 
 
 Demonstration
