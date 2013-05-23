@@ -1,6 +1,5 @@
-sbt-dependency-manager
+sbt-dependency-manager [![Build Status](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager)
 ======================
-[![Build Status](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/sbt-android-mill/sbt-dependency-manager)
 
 Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](https://github.com/sbt-android-mill/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple). Please, open `test` file
 
@@ -21,6 +20,10 @@ Table of contents
 -----------------
 
 - [Adding to your project](#adding-to-your-project)
+    - [Via interactive build](#via-interactive-build)
+    - [As published jar artifact](#as-published-jar-artifact)
+    - [As local build](#as-local-build)
+    - [Activate in your project](#activate-in-your-project)
 - [Usage](#usage)
     - [Fetch all dependencies](#fetch-all-dependencies)
     - [Filter dependencies](#filter-dependencies)
@@ -34,7 +37,13 @@ Table of contents
 - [License](#license)
 - [Copyright](#copyright)
 
-## Adding to your project ##
+## Adding to your project
+
+You may find sample project at [src/sbt-test/dependency-manager/simple](https://github.com/sbt-android-mill/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple)
+
+### Via interactive build
+
+Supported SBT versions: 0.11.x, 0.12.x, 0.13.x-SNAPSHOT.
 
 Create a
 
@@ -43,7 +52,7 @@ Create a
 
 file that looks like the following:
 
-```scala
+``` scala
     import sbt._
     object PluginDef extends Build {
       override def projects = Seq(root)
@@ -54,17 +63,41 @@ file that looks like the following:
 
 You may find more information about Build.scala at [https://github.com/harrah/xsbt/wiki/Plugins](https://github.com/harrah/xsbt/wiki/Plugins)
 
-Then in your _build.sbt_ file, simply add:
+### As published jar artifact
 
-``` scala
-    sbt.dependency.manager.Plugin.activate
-```
+Supported SBT versions: 0.11.3, 0.12.3, 0.13.0-20130520-052156
 
-You may find sample project at [src/sbt-test/dependency-manager/simple](https://github.com/sbt-android-mill/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple)
+    "org.digimead" % "sbt-dependency-manager" % "0.6.4"
+
+Maven repository:
+
+    resolvers += "digimead-maven" at "http://storage.googleapis.com/maven.repository.digimead.org/"
+
+Ivy repository:
 
     resolvers += Resolver.url("digimead-ivy", url("http://storage.googleapis.com/ivy.repository.digimead.org/"))(Resolver.defaultIvyPatterns)
 
-    resolvers += "digimead-maven" at "http://storage.googleapis.com/maven.repository.digimead.org/"
+### As local build
+
+Clone this repository to your development system then do `sbt publish-local`
+
+### Activate in your project
+
+For _build.sbt_, simply add:
+
+``` scala
+    import sbt.dependency.manager._
+    
+    activateDependencyManager
+```
+
+For _Build.scala_:
+
+``` scala
+    import sbt.dependency.manager._
+    
+    ... yourProjectSettings ++ activateDependencyManager
+```
 
 ## Usage ##
 
