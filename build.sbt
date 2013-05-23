@@ -17,7 +17,15 @@ ScriptedPlugin.scriptedSettings
 
 name := "sbt-dependency-manager"
 
+description := "SBT plugin that fetches project artifacts, composes jars with source code and aligns sources inside jars for your favorite IDE"
+
+licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+
 organization := "org.digimead"
+
+organizationHomepage := Some(url("http://digimead.org"))
+
+homepage := Some(url("https://github.com/digimead/sbt-dependency-manager"))
 
 version <<= (baseDirectory) { (b) => scala.io.Source.fromFile(b / "version").mkString.trim }
 
