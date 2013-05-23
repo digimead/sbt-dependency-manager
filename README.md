@@ -65,9 +65,9 @@ You may find more information about Build.scala at [https://github.com/harrah/xs
 
 ### As published jar artifact
 
-Supported SBT versions: 0.11.3, 0.12.3, 0.13.0-20130520-052156
+Supported SBT versions: 0.11.3, 0.12.3, 0.13.0-20130520-052156. Add to your _project/plugins.sbt_
 
-    "org.digimead" % "sbt-dependency-manager" % "0.6.4"
+    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4")
 
 Maven repository:
 
