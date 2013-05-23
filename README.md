@@ -115,7 +115,7 @@ or
 
 ### Fetch all dependencies
 
-By default sbt-dependency-manager skip "org.scala-lang" and "org.scala-sbt". If you need all dependencies do
+By default sbt-dependency-manager skips "org.scala-lang" and "org.scala-sbt". If you need all dependencies do
 
 ``` scala
     dependencyFilter := Seq()
@@ -132,7 +132,7 @@ By default sbt-dependency-manager skip "org.scala-lang" and "org.scala-sbt". If 
     },
 ````
 
-More about module filters look at [SBT Wiki](https://github.com/harrah/xsbt/wiki/Update-Report)
+For more about module filters look at [SBT Wiki](https://github.com/harrah/xsbt/wiki/Update-Report)
 
 ### Align project dependencies ###
 
