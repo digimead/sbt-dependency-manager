@@ -1,8 +1,10 @@
 ---
 language: scala
 script: "sbt 'set scriptedLaunchOpts := Seq(\"-Xms512m\", \"-Xmx512m\", \"-XX:MaxPermSize=256m\")' scripted"
-jdk:
-- oraclejdk7
-- openjdk7
 scala:
 - 2.9.2
+before_script:
+ - "echo JAVA_HOME $JAVA_HOME"
+ - "echo 'which java' `which java`"
+ - "echo JAVA_OPTS $JAVA_OPTS"
+ - "export JAVA_OPTS=-Xmx512m"
