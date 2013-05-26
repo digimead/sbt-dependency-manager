@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package sbt.dependency
+package org.digimead.sbt.dependency
 
 package object manager {
   /** Entry point for plugin in user's project */

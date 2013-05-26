@@ -1,4 +1,4 @@
-import sbt.dependency.manager._
+import org.digimead.sbt.dependency.manager._
 
 activateDependencyManager
 

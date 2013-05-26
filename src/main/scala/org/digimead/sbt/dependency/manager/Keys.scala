@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package sbt.dependency.manager
+package org.digimead.sbt.dependency.manager
 
 import java.util.zip.ZipEntry
 
