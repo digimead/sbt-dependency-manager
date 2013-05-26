@@ -57,7 +57,7 @@ object Plugin extends sbt.Plugin {
     dependencyResourceFilter := resourceFilter,
     dependencySkipResolved := true,
     // add the empty classifier ""
-    transitiveClassifiers in Global :== Seq("", Artifact.SourceClassifier, Artifact.DocClassifier))) ++
+    transitiveClassifiers in Global := Seq("", Artifact.SourceClassifier, Artifact.DocClassifier))) ++
     // global settings
     Seq(
       dependencyTaskBundle <<= dependencyTaskBundleTask,
