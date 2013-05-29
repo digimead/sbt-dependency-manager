@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.digimead.sbt.dependency.manager
+package sbt.dependency.manager
 
 import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
@@ -35,8 +35,8 @@ import scala.collection.mutable.HashSet
 import sbt._
 import sbt.Keys._
 import sbt.{ Keys => sk }
-import org.digimead.sbt.dependency.manager.Keys._
-import org.digimead.sbt.dependency.manager.{ Keys => dk }
+import sbt.dependency.manager.Keys._
+import sbt.dependency.manager.{ Keys => dk }
 import xsbti.AppConfiguration
 
 /**
