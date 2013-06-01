@@ -34,13 +34,16 @@ import scala.collection.mutable.HashSet
 
 import sbt._
 import sbt.Keys._
+import sbt.{ Keys => sk }
 import sbt.dependency.manager.Keys._
+import sbt.dependency.manager.{ Keys => dk }
 import xsbti.AppConfiguration
 
 /**
  * sbt-dependency-manager plugin entry
  */
 object Plugin extends sbt.Plugin {
+  implicit def option2rich[T](option: Option[T]): RichOption[T] = new RichOption(option)
   def logPrefix(name: String) = "[Dep manager:%s] ".format(name)
 
   lazy val defaultSettings = inConfig(Keys.DependencyConf)(Seq(
@@ -53,11 +56,11 @@ object Plugin extends sbt.Plugin {
       moduleFilter(organization = GlobFilter("org.scala-lang"), name = GlobFilter("scala-library")))),
     dependencyIgnoreConfiguration := true,
     dependencyLookupClasspath <<= dependencyLookupClasspathTask,
-    dependencyPath <<= (target in LocalRootProject) { _ / "deps" },
+    dependencyOutput <<= (target in ThisProject) { path => Some(path / "deps") },
     dependencyResourceFilter := resourceFilter,
     dependencySkipResolved := true,
     // add the empty classifier ""
-    transitiveClassifiers in Global :== Seq("", Artifact.SourceClassifier, Artifact.DocClassifier))) ++
+    transitiveClassifiers in Global := Seq("", Artifact.SourceClassifier, Artifact.DocClassifier))) ++
     // global settings
     Seq(
       dependencyTaskBundle <<= dependencyTaskBundleTask,
@@ -73,33 +76,32 @@ object Plugin extends sbt.Plugin {
         dependencyFilter, dependencyClasspath, ivySbt, streams, state, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
-        if ((dependencyEnable in thisScope get extracted.structure.data) getOrElse true) {
-          val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
-          streams.log.info(logPrefix(name) + "Fetch dependencies and align to bundle")
-          val result = for {
-            appConfiguration <- appConfiguration in thisScope get extracted.structure.data
-            ivyLoggingLevel <- ivyLoggingLevel in thisScope get extracted.structure.data
-            ivyScala <- ivyScala in thisScope get extracted.structure.data
-            pathTarget <- target in thisScope get extracted.structure.data
-            updateConfiguration <- updateConfiguration in thisScope get extracted.structure.data
-            dependencyEnableCustom <- dependencyEnableCustom in thisScope get extracted.structure.data
-            dependencyIgnoreConfiguration <- dependencyIgnoreConfiguration in thisScope get extracted.structure.data
-            dependencyPath <- dependencyPath in thisScope get extracted.structure.data
-            dependencyResourceFilter <- dependencyResourceFilter in thisScope get extracted.structure.data
-            dependencySkipResolved <- dependencySkipResolved in thisScope get extracted.structure.data
-            libraryDependenciesCompile <- libraryDependencies in thisScope in Compile get extracted.structure.data
-            libraryDependenciesTest <- libraryDependencies in thisScope in Test get extracted.structure.data
-          } yield {
+        val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
+        val output = dependencyOutput in thisScope get extracted.structure.data getOrThrow "dependencyOutput is undefined"
+        output match {
+          case Some(dependencyOutput) =>
+            streams.log.info(logPrefix(name) + "Fetch dependencies and align to bundle")
+            val appConfiguration = sk.appConfiguration in thisScope get extracted.structure.data getOrThrow "appConfiguration is undefined"
+            val ivyLoggingLevel = sk.ivyLoggingLevel in thisScope get extracted.structure.data getOrThrow "ivyLoggingLevel is undefined"
+            val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
+            val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
+            val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
+            val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
+            val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
+            val libraryDependenciesTest = sbt.Keys.libraryDependencies in thisScope in Test get extracted.structure.data getOrThrow "libraryDependencies in Test is undefined"
             val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathBundle, dependencyPath, pathTarget, streams, dependencyEnableCustom, None, true, dependencyClasspath,
+              pathBundle, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, true, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchWithSources)
-          }
-          result.get
-          () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
+          case None =>
+            streams.log.info(logPrefix(name) + "Fetch operation disabled")
         }
+        () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
       }
   /** Implementation of dependency-bundle-with-artifact */
   def dependencyTaskBundleWithArtifactTask =
@@ -109,33 +111,32 @@ object Plugin extends sbt.Plugin {
         dependencyFilter, dependencyClasspath, ivySbt, packageBin, state, streams, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
-        if ((dependencyEnable in thisScope get extracted.structure.data) getOrElse true) {
-          val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
-          streams.log.info(logPrefix(name) + "Fetch dependencies with artifact and align to bundle")
-          val result = for {
-            appConfiguration <- appConfiguration in thisScope get extracted.structure.data
-            ivyLoggingLevel <- ivyLoggingLevel in thisScope get extracted.structure.data
-            ivyScala <- ivyScala in thisScope get extracted.structure.data
-            pathTarget <- target in thisScope get extracted.structure.data
-            updateConfiguration <- updateConfiguration in thisScope get extracted.structure.data
-            dependencyEnableCustom <- dependencyEnableCustom in thisScope get extracted.structure.data
-            dependencyIgnoreConfiguration <- dependencyIgnoreConfiguration in thisScope get extracted.structure.data
-            dependencyPath <- dependencyPath in thisScope get extracted.structure.data
-            dependencyResourceFilter <- dependencyResourceFilter in thisScope get extracted.structure.data
-            dependencySkipResolved <- dependencySkipResolved in thisScope get extracted.structure.data
-            libraryDependenciesCompile <- libraryDependencies in thisScope in Compile get extracted.structure.data
-            libraryDependenciesTest <- libraryDependencies in thisScope in Test get extracted.structure.data
-          } yield {
+        val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
+        val output = dependencyOutput in thisScope get extracted.structure.data getOrThrow "dependencyOutput is undefined"
+        output match {
+          case Some(dependencyOutput) =>
+            streams.log.info(logPrefix(name) + "Fetch dependencies with artifact and align to bundle")
+            val appConfiguration = sk.appConfiguration in thisScope get extracted.structure.data getOrThrow "appConfiguration is undefined"
+            val ivyLoggingLevel = sk.ivyLoggingLevel in thisScope get extracted.structure.data getOrThrow "ivyLoggingLevel is undefined"
+            val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
+            val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
+            val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
+            val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
+            val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
+            val libraryDependenciesTest = sbt.Keys.libraryDependencies in thisScope in Test get extracted.structure.data getOrThrow "libraryDependencies in Test is undefined"
             val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathBundle, dependencyPath, pathTarget, streams, dependencyEnableCustom, Some(packageBin), true, dependencyClasspath,
+              pathBundle, dependencyOutput, pathTarget, streams, dependencyEnableCustom, Some(packageBin), true, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchWithSources)
-          }
-          result.get
-          () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
+          case None =>
+            streams.log.info(logPrefix(name) + "Fetch operation disabled")
         }
+        () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
       }
   /** Implementation of dependency-fetch-align */
   def dependencyTaskFetchAlignTask =
@@ -144,33 +145,32 @@ object Plugin extends sbt.Plugin {
         dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
-        if ((dependencyEnable in thisScope get extracted.structure.data) getOrElse true) {
-          val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
-          streams.log.info(logPrefix(name) + "Fetch dependencies and align")
-          val result = for {
-            appConfiguration <- appConfiguration in thisScope get extracted.structure.data
-            ivyLoggingLevel <- ivyLoggingLevel in thisScope get extracted.structure.data
-            ivyScala <- ivyScala in thisScope get extracted.structure.data
-            pathTarget <- target in thisScope get extracted.structure.data
-            updateConfiguration <- updateConfiguration in thisScope get extracted.structure.data
-            dependencyEnableCustom <- dependencyEnableCustom in thisScope get extracted.structure.data
-            dependencyIgnoreConfiguration <- dependencyIgnoreConfiguration in thisScope get extracted.structure.data
-            dependencyPath <- dependencyPath in thisScope get extracted.structure.data
-            dependencyResourceFilter <- dependencyResourceFilter in thisScope get extracted.structure.data
-            dependencySkipResolved <- dependencySkipResolved in thisScope get extracted.structure.data
-            libraryDependenciesCompile <- libraryDependencies in thisScope in Compile get extracted.structure.data
-            libraryDependenciesTest <- libraryDependencies in thisScope in Test get extracted.structure.data
-          } yield {
+        val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
+        val output = dependencyOutput in thisScope get extracted.structure.data getOrThrow "dependencyOutput is undefined"
+        output match {
+          case Some(dependencyOutput) =>
+            streams.log.info(logPrefix(name) + "Fetch dependencies and align")
+            val appConfiguration = sk.appConfiguration in thisScope get extracted.structure.data getOrThrow "appConfiguration is undefined"
+            val ivyLoggingLevel = sk.ivyLoggingLevel in thisScope get extracted.structure.data getOrThrow "ivyLoggingLevel is undefined"
+            val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
+            val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
+            val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
+            val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
+            val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
+            val libraryDependenciesTest = sbt.Keys.libraryDependencies in thisScope in Test get extracted.structure.data getOrThrow "libraryDependencies in Test is undefined"
             val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathBundle, dependencyPath, pathTarget, streams, dependencyEnableCustom, None, false, dependencyClasspath,
+              pathBundle, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, false, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchAlign)
-          }
-          result.get
-          () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
+          case None =>
+            streams.log.info(logPrefix(name) + "Fetch operation disabled")
         }
+        () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
       }
   /** Implementation of dependency-fetch-with-sources */
   def dependencyTaskFetchWithSourcesTask =
@@ -179,34 +179,33 @@ object Plugin extends sbt.Plugin {
         dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
-        if ((dependencyEnable in thisScope get extracted.structure.data) getOrElse true) {
-          val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
-          streams.log.info(logPrefix(name) + "Fetch dependencies with source code")
-          val result = for {
-            appConfiguration <- appConfiguration in thisScope get extracted.structure.data
-            ivyLoggingLevel <- ivyLoggingLevel in thisScope get extracted.structure.data
-            ivyScala <- ivyScala in thisScope get extracted.structure.data
-            pathTarget <- target in thisScope get extracted.structure.data
-            updateConfiguration <- updateConfiguration in thisScope get extracted.structure.data
-            dependencyEnableCustom <- dependencyEnableCustom in thisScope get extracted.structure.data
-            dependencyIgnoreConfiguration <- dependencyIgnoreConfiguration in thisScope get extracted.structure.data
-            dependencyPath <- dependencyPath in thisScope get extracted.structure.data
-            dependencyResourceFilter <- dependencyResourceFilter in thisScope get extracted.structure.data
-            dependencySkipResolved <- dependencySkipResolved in thisScope get extracted.structure.data
-            libraryDependenciesCompile <- libraryDependencies in thisScope in Compile get extracted.structure.data
-            libraryDependenciesTest <- libraryDependencies in thisScope in Test get extracted.structure.data
-          } yield {
+        val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
+        val output = dependencyOutput in thisScope get extracted.structure.data getOrThrow "dependencyOutput is undefined"
+        output match {
+          case Some(dependencyOutput) =>
+            streams.log.info(logPrefix(name) + "Fetch dependencies with source code")
+            val appConfiguration = sk.appConfiguration in thisScope get extracted.structure.data getOrThrow "appConfiguration is undefined"
+            val ivyLoggingLevel = sk.ivyLoggingLevel in thisScope get extracted.structure.data getOrThrow "ivyLoggingLevel is undefined"
+            val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
+            val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
+            val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
+            val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
+            val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
+            val libraryDependenciesTest = sbt.Keys.libraryDependencies in thisScope in Test get extracted.structure.data getOrThrow "libraryDependencies in Test is undefined"
             val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathBundle, dependencyPath, pathTarget, streams,
+              pathBundle, dependencyOutput, pathTarget, streams,
               dependencyEnableCustom, None, false, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchWithSources)
-          }
-          result.get
-          () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
+          case None =>
+            streams.log.info(logPrefix(name) + "Fetch operation disabled")
         }
+        () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
       }
   /** Implementation of dependency-fetch */
   def dependencyTaskFetchTask =
@@ -215,33 +214,32 @@ object Plugin extends sbt.Plugin {
         (origClassifiersModule, pathBundle, dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
           val extracted: Extracted = Project.extract(state)
           val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
-          if ((dependencyEnable in thisScope get extracted.structure.data) getOrElse true) {
-            val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
-            streams.log.info(logPrefix(name) + "Fetch dependencies")
-            val result = for {
-              appConfiguration <- appConfiguration in thisScope get extracted.structure.data
-              ivyLoggingLevel <- ivyLoggingLevel in thisScope get extracted.structure.data
-              ivyScala <- ivyScala in thisScope get extracted.structure.data
-              pathTarget <- target in thisScope get extracted.structure.data
-              updateConfiguration <- updateConfiguration in thisScope get extracted.structure.data
-              dependencyEnableCustom <- dependencyEnableCustom in thisScope get extracted.structure.data
-              dependencyIgnoreConfiguration <- dependencyIgnoreConfiguration in thisScope get extracted.structure.data
-              dependencyPath <- dependencyPath in thisScope get extracted.structure.data
-              dependencyResourceFilter <- dependencyResourceFilter in thisScope get extracted.structure.data
-              dependencySkipResolved <- dependencySkipResolved in thisScope get extracted.structure.data
-              libraryDependenciesCompile <- libraryDependencies in thisScope in Compile get extracted.structure.data
-              libraryDependenciesTest <- libraryDependencies in thisScope in Test get extracted.structure.data
-            } yield {
+          val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
+          val output = dependencyOutput in thisScope get extracted.structure.data getOrThrow "dependencyOutput is undefined"
+          output match {
+            case Some(dependencyOutput) =>
+              streams.log.info(logPrefix(name) + "Fetch dependencies")
+              val appConfiguration = sk.appConfiguration in thisScope get extracted.structure.data getOrThrow "appConfiguration is undefined"
+              val ivyLoggingLevel = sk.ivyLoggingLevel in thisScope get extracted.structure.data getOrThrow "ivyLoggingLevel is undefined"
+              val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
+              val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
+              val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
+              val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+              val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+              val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
+              val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
+              val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
+              val libraryDependenciesTest = sbt.Keys.libraryDependencies in thisScope in Test get extracted.structure.data getOrThrow "libraryDependencies in Test is undefined"
               val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
               val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
                 origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-                pathBundle, dependencyPath, pathTarget, streams, dependencyEnableCustom, None, false, dependencyClasspath,
+                pathBundle, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, false, dependencyClasspath,
                 dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
               commonFetchTask(argument, doFetch)
-            }
-            result.get
-            () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
+            case None =>
+              streams.log.info(logPrefix(name) + "Fetch operation disabled")
           }
+          () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
       }
   /**
    * Task that returns the union of fullClasspath in Compile and Test configurations
@@ -708,5 +706,8 @@ object Plugin extends sbt.Plugin {
       null
     val bundleEntries = HashSet[String]()
     val bundleResources = HashSet[String]()
+  }
+  class RichOption[T](option: Option[T]) {
+    def getOrThrow(onError: String) = option getOrElse { throw new NoSuchElementException(onError) }
   }
 }

@@ -107,13 +107,13 @@ For _Build.scala_:
 By default aligned jars saved to _target/deps_ Change _dependenciesPath_ at your project to something like
 
 ``` scala
-    dependencyPath <<= (baseDirectory) (_ / "my-aling-dir")
+    dependencyOutput <<= (baseDirectory) (path => Some(path / "my-aling-dir"))
 ```
 
 or
 
 ``` scala
-    DMKey.dependencyPath in DMConf <<= (baseDirectory) (_ / "deps")
+    DMKey.dependencyOutput in DMConf <<= (baseDirectory) (dir => Some(dir / "deps"))
 ```
 
 ### Fetch all dependencies
@@ -169,7 +169,7 @@ It is very useful to develop simple-build-tool plugins. Most SBT source code are
 ### Fetch project dependencies with sources to '123' directory
 
 ```
-> set dependencyPath <<= baseDirectory map {(f) => f / "123" }
+> set dependencyOutput <<= baseDirectory { (f) => Some(f / "123") }
 > dependency-fetch-with-sources
 ```
 
@@ -182,12 +182,11 @@ You may inspect all available parameters in [Keys object](https://github.com/dig
 
 * __add-custom__ (dependencyAddCustom) - Add custom(unknown) libraries to results.
 * __bundle-path__ (dependencyBundlePath) - Path to bundle with fetched artifacts.
-* __enable__ (dependencyEnable) - Enable/disable plugin. It is very usefull in nested project environments when parent project already provided all dependencies and child project inherits parent settings.
 * __enable-custom-libraries__ (dependencyEnableCustom) - Enables to fetch libraries that come from alternative sources like unmanaged artifacts or plugin specific library.
 * __filter__ (dependencyFilter) - Processing dependencies only with particular sbt.ModuleID. [Example](#filter-dependencies).
 * __ignore-configurations__ (dependencyIgnoreConfigurations) - Ignore configurations while lookup, 'test' for example.
 * __lookup-classpath__ (dependencyLookupClasspath) - Classpath that is used for building the sequence of fetched dependencies.
-* __path__ (dependencyPath) - Target directory for dependency jars. [Example](#usage).
+* __output__ (dependencyOutput) - Target directory for dependency jars. Fetch disabled if None. [Example](#usage).
 * __resource-filter__ (dependencyResourceFilter) - Fuction for filtering jar content when we use `dependency-fetch-align`. [Example](#jar-entities-filter).
 * __skip-resolved__ (dependencySkipResolved) - Skip already resolved dependencies with explicit artifacts which points to local resources. For example dependencies which you add manually to your SBT project like `"a" % "b" % "c" from file://bla/bla/...`
 

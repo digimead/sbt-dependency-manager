@@ -29,12 +29,11 @@ object Keys {
 
   lazy val dependencyBundlePath = TaskKey[java.io.File]("bundle-path", "Bundle jar location")
   lazy val dependencyClasspathFilter = TaskKey[ModuleFilter]("predefined-classpath-filter", "Predefined filter that accept all modules in project classpath.")
-  lazy val dependencyEnable = SettingKey[Boolean]("enable", "Enable plugin tasks. Useful in multi project environment with nested dependencies.")
   lazy val dependencyEnableCustom = SettingKey[Boolean]("enable-custom-libraries", "Add custom(unknown) libraries to results")
   lazy val dependencyFilter = TaskKey[Option[ModuleFilter]]("filter", "Filtering dependencies with particular sbt.ModuleID")
   lazy val dependencyIgnoreConfiguration = SettingKey[Boolean]("ignore-configurations", "Ignore configurations while lookup like 'test', for example")
   lazy val dependencyLookupClasspath = TaskKey[Classpath]("lookup-classpath", "Classpath that is used for building the dependency sequence")
-  lazy val dependencyPath = SettingKey[java.io.File]("path", "Target directory for fetched jars")
+  lazy val dependencyOutput = SettingKey[Option[java.io.File]]("output", "Target directory for fetched artifacts. Fetch disabled if None.")
   lazy val dependencyResourceFilter = SettingKey[ZipEntry => Boolean]("resource-filter", "Function for filtering jar content.")
   lazy val dependencySkipResolved = SettingKey[Boolean]("skip-resolved", "Skip resolved dependencies with explicit artifacts which points to local resources")
   lazy val dependencyTaskBundle = TaskKey[Unit]("dependency-bundle", "Fetch dependency code and source jars. Save results to bundle.")
