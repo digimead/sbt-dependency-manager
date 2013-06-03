@@ -9,7 +9,7 @@ It is provide an ability:
 * to fetch __all dependency jars (include sbt-dependency-manager itself)__ to target folder
 * to fetch __all dependency jars with sources (include sbt-dependency-manager itself)__ to target folder
 * to fetch __all dependency jars with sources, merge them (include sbt-dependency-manager itself)__ and save to target folder
-* join all fetched artifacts to solid jar bundle, that simplify project setup and provide rapid develoment dependency for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, OSGi bundles from P2 update sites and ivy/maven libraries :-)
+* join all fetched artifacts to solid consolidated jar, that simplify project setup and provide rapid develoment dependency for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, OSGi bundles from P2 update sites and ivy/maven libraries :-)
 
 If you want to improve it, please send mail to sbt-android-mill at digimead.org. You will be added to the group. Please, feel free to add yourself to authors.
 
@@ -44,7 +44,7 @@ You may find sample project at [src/sbt-test/dependency-manager/simple](https://
 
 ### Via interactive build
 
-Supported SBT versions: 0.11.x, 0.12.x, 0.13.x-SNAPSHOT.
+Supported SBT versions: 0.11.x, 0.12.x.
 
 Create a
 
@@ -58,7 +58,7 @@ file that looks like the following:
     object PluginDef extends Build {
       override def projects = Seq(root)
       lazy val root = Project("plugins", file(".")) dependsOn(dm)
-      lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#0.6.4.2")
+      lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#0.6.4.4")
     }
 ```
 
@@ -66,9 +66,9 @@ You may find more information about Build.scala at [https://github.com/harrah/xs
 
 ### As published jar artifact
 
-Supported SBT versions: 0.11.3, 0.12.3, 0.13.0-20130520-052156. Add to your _project/plugins.sbt_
+Supported SBT versions: 0.11.3, 0.12.x. Add to your _project/plugins.sbt_
 
-    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4.2")
+    addSbtPlugin("org.digimead" % "sbt-dependency-manager" % "0.6.4.4")
 
 Maven repository:
 
@@ -89,7 +89,7 @@ For _build.sbt_, simply add:
 ``` scala
     import sbt.dependency.manager._
 
-    activateDependencyManager
+    DependencyManager
 ```
 
 For _Build.scala_:
@@ -97,8 +97,10 @@ For _Build.scala_:
 ``` scala
     import sbt.dependency.manager._
 
-    ... yourProjectSettings ++ activateDependencyManager
+    ... yourProjectSettings ++ DependencyManager
 ```
+
+[Imported package](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/package.scala) contains public declarations.
 
 ## Usage ##
 
@@ -179,7 +181,7 @@ You may inspect all available parameters in [Keys object](https://github.com/dig
 ### Options ###
 
 * __add-custom__ (dependencyAddCustom) - Add custom(unknown) libraries to results.
-* __bundle-path__ (dependencyBundlePath) - Path to bundle with fetched artifacts.
+* __pack-path__ (dependencyPackPath) - Path to consolidated jar with fetched artifacts.
 * __enable-custom-libraries__ (dependencyEnableCustom) - Enables to fetch libraries that come from alternative sources like unmanaged artifacts or plugin specific library.
 * __filter__ (dependencyFilter) - Processing dependencies only with particular sbt.ModuleID. [Example](#filter-dependencies).
 * __ignore-configurations__ (dependencyIgnoreConfigurations) - Ignore configurations while lookup, 'test' for example.
@@ -190,8 +192,8 @@ You may inspect all available parameters in [Keys object](https://github.com/dig
 
 ### Tasks ###
 
-* __dependency-bundle__ - Fetch dependency code and source jars. Save results to bundle.
-* __dependency-bundle-with-artifact__ - Fetch dependency code and source jars, add project artefact. Save results to bundle.
+* __dependency-pack__ - Fetch dependency code and source jars. Save results to consolidated jar.
+* __dependency-pack-with-artifact__ - Fetch dependency code and source jars, add project artefact. Save results to consolidated jar.
 * __dependency-fetch__ - Fetch project jars. Save result to target directory.
 * __dependency-fetch-align__ - Fetch project jars, merge them with source code. Save result to target directory.
 * __dependency-fetch-with-sources__ - Fetch project jars, fetch source jars. Save result to target directory.
