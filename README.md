@@ -40,9 +40,6 @@ Table of contents
 - [License](#license)
 - [Copyright](#copyright)
 
-DOCUMENTATION
--------------
-
 ## Adding to your project
 
 You may find sample project at [src/sbt-test/dependency-manager/simple](src/sbt-test/dependency-manager/simple)
