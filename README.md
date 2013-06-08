@@ -104,6 +104,8 @@ For _Build.scala_:
 
 ## Usage ##
 
+[Plugin keys](https://github.com/digimead/sbt-dependency-manager/blob/master/src/main/scala/sbt/dependency/manager/Keys.scala)
+
 By default aligned jars saved to _target/deps_ Change _dependenciesPath_ at your project to something like
 
 ``` scala
