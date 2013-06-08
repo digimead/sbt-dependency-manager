@@ -1,6 +1,6 @@
 import sbt.dependency.manager._
 
-activateDependencyManager
+DependencyManager
 
 name := "Simple"
 
