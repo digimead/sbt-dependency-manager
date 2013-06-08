@@ -64,7 +64,7 @@ file that looks like the following:
     }
 ```
 
-You may find more information about Build.scala at [https://github.com/harrah/xsbt/wiki/Plugins](https://github.com/harrah/xsbt/wiki/Plugins)
+You may find more information about Build.scala at [http://www.scala-sbt.org/release/docs/Extending/Plugins](https://github.com/harrah/xsbt/wiki/Plugins)
 
 ### As published jar artifact
 
