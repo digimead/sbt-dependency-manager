@@ -1,7 +1,7 @@
 sbt-dependency-manager [![Build Status](https://travis-ci.org/digimead/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/digimead/sbt-dependency-manager)
 ======================
 
-Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple). Please, open `test` file.
+Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](src/sbt-test/dependency-manager/simple). Please, open `test` file.
 
 What is it? You may fetch [SBT](https://github.com/sbt/sbt "Simple Build Tool") project artifacts, compose jars with source code, align sources inside jars for your favorite IDE
 
@@ -102,11 +102,11 @@ For _Build.scala_:
     ... yourProjectSettings ++ DependencyManager
 ```
 
-[Imported package](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/package.scala) contains public declarations.
+[Imported package](src/main/scala/sbt/dependency/manager/package.scala) contains public declarations.
 
 ## Usage ##
 
-[Plugin keys](https://github.com/digimead/sbt-dependency-manager/blob/master/src/main/scala/sbt/dependency/manager/Keys.scala)
+[Plugin keys](src/main/scala/sbt/dependency/manager/Keys.scala)
 
 By default aligned jars saved to _target/deps_ Change _dependenciesPath_ at your project to something like
 
@@ -180,7 +180,7 @@ It is very useful to develop simple-build-tool plugins. Most SBT source code are
 Internals
 ---------
 
-You may inspect all available parameters in [Keys object](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/Keys.scala).
+You may inspect all available parameters in [Keys object](src/main/scala/sbt/dependency/manager/Keys.scala).
 
 ### Options ###
 
