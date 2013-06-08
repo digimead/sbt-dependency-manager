@@ -21,9 +21,14 @@ package sbt.dependency
 
 package object manager {
   /** Entry point for plugin in user's project */
-  lazy val activateDependencyManager = Plugin.defaultSettings
+  lazy val DependencyManager = Plugin.defaultSettings
 
   // export declarations for end user
   lazy val DMKey = Keys
   lazy val DMConf = Keys.DependencyConf
+
+  // public keys
+  def dependencyEnableCustom = Keys.dependencyEnableCustom
+  def dependencyOutput = Keys.dependencyOutput
+  def dependencyPackPath = Keys.dependencyPackPath
 }
