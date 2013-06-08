@@ -15,7 +15,7 @@ If you want to improve it, please send mail to sbt-android-mill at digimead.org.
 
 SBT source code is really simple to read and simple to extend :-)
 
-*IMPORTANT. You may fetch artifacts only for those plugins that were added via ```addSbtPlugin``` as jar files. Source code of dynamicaly compiled plugins or dependencies are not fetched. That is expected.*
+*IMPORTANT. You may fetch artifacts only for those plugins that were added via ```addSbtPlugin``` as jar files. Source code of dynamicaly compiled plugins or dependencies are not fetched. This is expected.*
 
 This readme cover all plugin functionality, even if it is written in broken english (would you have preferred well written russian :-) Please, correct it, if you find something inappropriate.
 
