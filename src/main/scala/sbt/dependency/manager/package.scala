@@ -29,6 +29,7 @@ package object manager {
 
   // public keys
   def dependencyEnableCustom = Keys.dependencyEnableCustom
+  def dependencyFilter = Keys.dependencyFilter
   def dependencyOutput = Keys.dependencyOutput
   def dependencyPackPath = Keys.dependencyPackPath
 }

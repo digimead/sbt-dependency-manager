@@ -24,6 +24,8 @@ import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.PrintWriter
+import java.util.Date
+import java.util.Properties
 import java.util.jar.JarInputStream
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
@@ -49,14 +51,15 @@ object Plugin extends sbt.Plugin {
   lazy val defaultSettings = inConfig(Keys.DependencyConf)(Seq(
     dependencyEnableCustom := true,
     dependencyPackPath <<= (target, normalizedName) map { (target, name) => target / (name + "-development.jar") },
-    dependencyClasspathFilter <<= (dependencyLookupClasspathTask) map (cp =>
+    dependencyClasspathFilter <<= (dependencyLookupClasspath) map (cp =>
       cp.flatMap(_.get(moduleID.key)).foldLeft(moduleFilter(NothingFilter, NothingFilter, NothingFilter))((acc, m) => acc |
         moduleFilter(GlobFilter(m.organization), GlobFilter(m.name), GlobFilter(m.revision)))),
     dependencyFilter <<= dependencyClasspathFilter map (dcf => Some(dcf -
       moduleFilter(organization = GlobFilter("org.scala-lang"), name = GlobFilter("scala-library")))),
     dependencyIgnoreConfiguration := true,
-    dependencyLookupClasspath <<= dependencyLookupClasspathTask,
+    dependencyLookupClasspath <<= Classpaths.concatDistinct(externalDependencyClasspath in Compile, externalDependencyClasspath in Test),
     dependencyOutput <<= (target in ThisProject) { path => Some(path / "deps") },
+    dependencyPluginInfo <<= dependencyPluginInfoTask,
     dependencyResourceFilter := resourceFilter,
     dependencySkipResolved := true,
     // add the empty classifier ""
@@ -69,6 +72,23 @@ object Plugin extends sbt.Plugin {
       dependencyTaskFetchAlign <<= dependencyTaskFetchAlignTask,
       dependencyTaskFetchWithSources <<= dependencyTaskFetchWithSourcesTask)
 
+  /** Show plugin information */
+  def dependencyPluginInfoTask = (state, streams, thisProjectRef) map { (state, streams, thisProjectRef) =>
+    val extracted: Extracted = Project.extract(state)
+    val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
+    val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
+    Option(getClass().getClassLoader().getResourceAsStream("version-sbt-dependency-manager.properties")) match {
+      case Some(stream) =>
+        val properties = new Properties()
+        properties.load(stream)
+        val date = new Date(properties.getProperty("build").toLong * 1000)
+        streams.log.info(logPrefix(name) + "Name: " + properties.getProperty("name"))
+        streams.log.info(logPrefix(name) + "Version: " + properties.getProperty("version"))
+        streams.log.info(logPrefix(name) + "Build: " + date + " (" + properties.getProperty("build") + ")")
+      case None =>
+        streams.log.error(logPrefix(name) + "Dependency Mananger plugin information not found.")
+    }
+  }
   /** Implementation of dependency-pack */
   def dependencyTaskPackTask =
     (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyFilter in DependencyConf,
@@ -242,11 +262,6 @@ object Plugin extends sbt.Plugin {
           () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
       }
   /**
-   * Task that returns the union of fullClasspath in Compile and Test configurations
-   */
-  def dependencyLookupClasspathTask =
-    (externalDependencyClasspath in Compile, externalDependencyClasspath in Test) map ((cpA, cpB) => (cpA ++ cpB).distinct)
-  /**
    * Dependency resource filter
    * It drops META-INF/ .SF .DSA .RSA files by default
    */
@@ -314,6 +329,7 @@ object Plugin extends sbt.Plugin {
     synchronized {
       Classpaths.withExcludes(arg.pathTarget, arg.origClassifiersModule.classifiers, Defaults.lock(arg.appConfiguration)) { excludes =>
         import arg.origClassifiersModule.{ id => origClassifiersModuleID, modules => origClassifiersModuleDeps }
+        arg.streams.log.debug(logPrefix(arg.name) + "Fetch dependencies to " + arg.pathDependency)
         if (arg.dependencyPack)
           arg.streams.log.info(logPrefix(arg.name) + "Create consolidated jar " + arg.pathPack)
         // do default update-sbt-classifiers with libDeps
@@ -328,6 +344,7 @@ object Plugin extends sbt.Plugin {
           else
             all
         }
+        arg.streams.log.debug(logPrefix(arg.name) + "Detected dependencies: " + extClassifiersModuleDeps.mkString(","))
         // skip dependency that already have explicit artifacts which points to local resources
         val extClassifiersModuleDepsFiltered = {
           if (arg.dependencySkipResolved)
@@ -338,6 +355,7 @@ object Plugin extends sbt.Plugin {
           else
             extClassifiersModuleDeps
         }
+        arg.streams.log.debug(logPrefix(arg.name) + "Filtered dependencies: " + extClassifiersModuleDepsFiltered.mkString(","))
         val customConfig = GetClassifiersConfiguration(arg.origClassifiersModule, excludes, arg.updateConfiguration, arg.ivyScala)
         val customBaseModuleID = restrictedCopy(origClassifiersModuleID, true).copy(name = origClassifiersModuleID.name + "$sbt")
         val customIvySbtModule = new arg.ivySbt.Module(InlineConfiguration(customBaseModuleID, ModuleInfo(customBaseModuleID.name), extClassifiersModuleDepsFiltered).copy(ivyScala = arg.ivyScala))

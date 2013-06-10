@@ -25,7 +25,7 @@ import sbt._
 import sbt.Keys._
 
 object Keys {
-  def DependencyConf = config("dependency-manager") hide
+  def DependencyConf = config("dependency") hide
 
   lazy val dependencyPackPath = TaskKey[java.io.File]("dependency-pack-path", "Consolidated jar location.")
   lazy val dependencyClasspathFilter = TaskKey[ModuleFilter]("dependency-predefined-classpath-filter", "Predefined filter that accept all modules in project classpath.")
@@ -34,6 +34,7 @@ object Keys {
   lazy val dependencyIgnoreConfiguration = SettingKey[Boolean]("dependency-ignore-configurations", "Ignore configurations while lookup like 'test', for example.")
   lazy val dependencyLookupClasspath = TaskKey[Classpath]("dependency-lookup-classpath", "Classpath that is used for building the dependency sequence.")
   lazy val dependencyOutput = SettingKey[Option[java.io.File]]("dependency-output", "Target directory for fetched artifacts. Fetch disabled if None.")
+  lazy val dependencyPluginInfo = TaskKey[Unit]("dependency-plugin-info", "Show plugin information.")
   lazy val dependencyResourceFilter = SettingKey[ZipEntry => Boolean]("dependency-resource-filter", "Function for filtering jar content.")
   lazy val dependencySkipResolved = SettingKey[Boolean]("dependency-skip-resolved", "Skip resolved dependencies with explicit artifacts which points to local resources.")
   lazy val dependencyTaskPack = TaskKey[Unit]("dependency-pack", "Fetch dependency code and source jars. Save results to consolidated jar.")

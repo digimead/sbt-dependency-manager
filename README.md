@@ -1,7 +1,7 @@
 sbt-dependency-manager [![Build Status](https://travis-ci.org/digimead/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/digimead/sbt-dependency-manager)
 ======================
 
-Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple). Please, open `test` file.
+Short introduction: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube (demo of one of the first versions) or [look at the test project](src/sbt-test/dependency-manager/simple). Please, open `test` file.
 
 What is it? You may fetch [SBT](https://github.com/sbt/sbt "Simple Build Tool") project artifacts, compose jars with source code, align sources inside jars for your favorite IDE
 
@@ -11,9 +11,11 @@ It is provide an ability:
 * to fetch __all dependency jars with sources, merge them (include sbt-dependency-manager itself)__ and save to target folder
 * join all fetched artifacts to solid consolidated jar, that simplify project setup and provide rapid develoment dependency for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, OSGi bundles from P2 update sites and ivy/maven libraries :-)
 
-If you want to improve it, please send mail to sbt-android-mill at digimead.org. You will be added to the group. Please, feel free to add yourself to authors.
+If you want to improve it, please send mail to sbt-android-mill at digimead.org. You will be granted write access. Please, feel free to add yourself to authors.
 
 SBT source code is really simple to read and simple to extend :-)
+
+*IMPORTANT. You may fetch artifacts only for those plugins that were added via ```addSbtPlugin``` as jar files. Source code of dynamicaly compiled plugins or dependencies are not fetched. This is expected.*
 
 This readme cover all plugin functionality, even if it is written in broken english (would you have preferred well written russian :-) Please, correct it, if you find something inappropriate.
 
@@ -40,7 +42,7 @@ Table of contents
 
 ## Adding to your project
 
-You may find sample project at [src/sbt-test/dependency-manager/simple](https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple)
+You may find sample project at [src/sbt-test/dependency-manager/simple](src/sbt-test/dependency-manager/simple)
 
 ### Via interactive build
 
@@ -62,7 +64,7 @@ file that looks like the following:
     }
 ```
 
-You may find more information about Build.scala at [https://github.com/harrah/xsbt/wiki/Plugins](https://github.com/harrah/xsbt/wiki/Plugins)
+You may find more information about Build.scala in [SBT documentation](http://www.scala-sbt.org/release/docs/Extending/Plugins)
 
 ### As published jar artifact
 
@@ -100,11 +102,11 @@ For _Build.scala_:
     ... yourProjectSettings ++ DependencyManager
 ```
 
-[Imported package](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/package.scala) contains public declarations.
+[Imported package](src/main/scala/sbt/dependency/manager/package.scala) contains public declarations.
 
 ## Usage ##
 
-[Plugin keys](https://github.com/digimead/sbt-dependency-manager/blob/master/src/main/scala/sbt/dependency/manager/Keys.scala)
+[Plugin keys](src/main/scala/sbt/dependency/manager/Keys.scala)
 
 By default aligned jars saved to _target/deps_ Change _dependenciesPath_ at your project to something like
 
@@ -178,7 +180,7 @@ It is very useful to develop simple-build-tool plugins. Most SBT source code are
 Internals
 ---------
 
-You may inspect all available parameters in [Keys object](https://github.com/digimead/sbt-dependency-manager/tree/master/src/main/scala/sbt/dependency/manager/Keys.scala).
+You may inspect all available parameters in [Keys object](src/main/scala/sbt/dependency/manager/Keys.scala).
 
 ### Options ###
 
