@@ -30,7 +30,7 @@ homepage := Some(url("https://github.com/digimead/sbt-dependency-manager"))
 version <<= (baseDirectory) { (b) => scala.io.Source.fromFile(b / "version").mkString.trim }
 
 // There is no "-Xfatal-warnings" because we have cross compilation against different Scala versions
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit")
+scalacOptions ++= Seq("-encoding", "UTF-8", "-unchecked", "-deprecation", "-Xcheckinit")
 
 // http://vanillajava.blogspot.ru/2012/02/using-java-7-to-target-much-older-jvms.html
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation", "-source", "1.6", "-target", "1.6")
@@ -40,6 +40,14 @@ if (sys.env.contains("XBOOTCLASSPATH")) Seq(javacOptions += "-Xbootclasspath:" +
 sbtPlugin := true
 
 scriptedBufferLog := false
+
+resourceGenerators in Compile <+=
+  (resourceManaged in Compile, name, version) map { (dir, n, v) =>
+    val file = dir / "version-%s.properties".format(n)
+    val contents = "name=%s\nversion=%s\nbuild=%s\n".format(n, v, ((System.currentTimeMillis / 1000).toInt).toString)
+    IO.write(file, contents)
+    Seq(file)
+  }
 
 resolvers ++= Seq(
   "dependency-mananger-digimead-maven" at "http://storage.googleapis.com/maven.repository.digimead.org/",
