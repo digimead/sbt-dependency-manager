@@ -49,6 +49,7 @@ object Plugin extends sbt.Plugin {
   def logPrefix(name: String) = "[Dep manager:%s] ".format(name)
 
   lazy val defaultSettings = inConfig(Keys.DependencyConf)(Seq(
+    dependencyAdditionalArtifacts := Seq(),
     dependencyEnableCustom := true,
     dependencyPackPath <<= (target, normalizedName) map { (target, name) => target / (name + "-development.jar") },
     dependencyClasspathFilter <<= (dependencyLookupClasspath) map (cp =>
@@ -67,7 +68,6 @@ object Plugin extends sbt.Plugin {
     // global settings
     Seq(
       dependencyTaskPack <<= dependencyTaskPackTask,
-      dependencyTaskPackWithArtifact <<= dependencyTaskPackWithArtifactTask,
       dependencyTaskFetch <<= dependencyTaskFetchTask,
       dependencyTaskFetchAlign <<= dependencyTaskFetchAlignTask,
       dependencyTaskFetchWithSources <<= dependencyTaskFetchWithSourcesTask)
@@ -91,9 +91,9 @@ object Plugin extends sbt.Plugin {
   }
   /** Implementation of dependency-pack */
   def dependencyTaskPackTask =
-    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyFilter in DependencyConf,
-      dependencyLookupClasspath in DependencyConf, ivySbt, streams, state, thisProjectRef) map { (origClassifiersModule, pathPack,
-        dependencyFilter, dependencyClasspath, ivySbt, streams, state, thisProjectRef) =>
+    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyAdditionalArtifacts in DependencyConf,
+      dependencyFilter in DependencyConf, dependencyLookupClasspath in DependencyConf, ivySbt, streams, state, thisProjectRef) map { (origClassifiersModule, pathPack,
+        additionalArtifacts, dependencyFilter, dependencyClasspath, ivySbt, streams, state, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
         val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
@@ -115,42 +115,7 @@ object Plugin extends sbt.Plugin {
             val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, true, dependencyClasspath,
-              dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
-            commonFetchTask(argument, doFetchWithSources)
-          case None =>
-            streams.log.info(logPrefix(name) + "Fetch operation disabled")
-        }
-        () // Returns Unit. Return type isn't defined explicitly because it is different for different SBT versions.
-      }
-  /** Implementation of dependency-pack-with-artifact */
-  def dependencyTaskPackWithArtifactTask =
-    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf,
-      dependencyFilter in DependencyConf, dependencyLookupClasspath in DependencyConf,
-      ivySbt, packageBin in Compile, state, streams, thisProjectRef) map { (origClassifiersModule, pathPack,
-        dependencyFilter, dependencyClasspath, ivySbt, packageBin, state, streams, thisProjectRef) =>
-        val extracted: Extracted = Project.extract(state)
-        val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
-        val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
-        val output = dependencyOutput in thisScope get extracted.structure.data getOrThrow "dependencyOutput is undefined"
-        output match {
-          case Some(dependencyOutput) =>
-            streams.log.info(logPrefix(name) + "Fetch dependencies with artifact and align to consolidated jar.")
-            val appConfiguration = sk.appConfiguration in thisScope get extracted.structure.data getOrThrow "appConfiguration is undefined"
-            val ivyLoggingLevel = sk.ivyLoggingLevel in thisScope get extracted.structure.data getOrThrow "ivyLoggingLevel is undefined"
-            val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
-            val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
-            val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
-            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
-            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
-            val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
-            val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
-            val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
-            val libraryDependenciesTest = sbt.Keys.libraryDependencies in thisScope in Test get extracted.structure.data getOrThrow "libraryDependencies in Test is undefined"
-            val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
-            val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
-              origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, Some(packageBin), true, dependencyClasspath,
+              pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, additionalArtifacts, true, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchWithSources)
           case None =>
@@ -160,9 +125,9 @@ object Plugin extends sbt.Plugin {
       }
   /** Implementation of dependency-fetch-align */
   def dependencyTaskFetchAlignTask =
-    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyFilter in DependencyConf,
-      dependencyLookupClasspath in DependencyConf, ivySbt, state, streams, thisProjectRef) map { (origClassifiersModule, pathPack,
-        dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
+    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyAdditionalArtifacts in DependencyConf,
+      dependencyFilter in DependencyConf, dependencyLookupClasspath in DependencyConf, ivySbt, state, streams, thisProjectRef) map { (origClassifiersModule, pathPack,
+        additionalArtifacts, dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
         val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
@@ -184,7 +149,7 @@ object Plugin extends sbt.Plugin {
             val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-              pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, false, dependencyClasspath,
+              pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, additionalArtifacts, false, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchAlign)
           case None =>
@@ -194,9 +159,9 @@ object Plugin extends sbt.Plugin {
       }
   /** Implementation of dependency-fetch-with-sources */
   def dependencyTaskFetchWithSourcesTask =
-    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyFilter in DependencyConf,
-      dependencyLookupClasspath in DependencyConf, ivySbt, state, streams, thisProjectRef) map { (origClassifiersModule, pathPack,
-        dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
+    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyAdditionalArtifacts in DependencyConf,
+      dependencyFilter in DependencyConf, dependencyLookupClasspath in DependencyConf, ivySbt, state, streams, thisProjectRef) map { (origClassifiersModule, pathPack,
+        additionalArtifacts, dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
         val extracted: Extracted = Project.extract(state)
         val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
         val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
@@ -219,7 +184,7 @@ object Plugin extends sbt.Plugin {
             val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
               origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
               pathPack, dependencyOutput, pathTarget, streams,
-              dependencyEnableCustom, None, false, dependencyClasspath,
+              dependencyEnableCustom, None, additionalArtifacts, false, dependencyClasspath,
               dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
             commonFetchTask(argument, doFetchWithSources)
           case None =>
@@ -229,9 +194,9 @@ object Plugin extends sbt.Plugin {
       }
   /** Implementation of dependency-fetch */
   def dependencyTaskFetchTask =
-    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyFilter in DependencyConf,
-      dependencyLookupClasspath in DependencyConf, ivySbt, state, streams, thisProjectRef) map {
-        (origClassifiersModule, pathPack, dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
+    (classifiersModule in updateSbtClassifiers, dependencyPackPath in DependencyConf, dependencyAdditionalArtifacts in DependencyConf,
+      dependencyFilter in DependencyConf, dependencyLookupClasspath in DependencyConf, ivySbt, state, streams, thisProjectRef) map {
+        (origClassifiersModule, pathPack, additionalArtifacts, dependencyFilter, dependencyClasspath, ivySbt, state, streams, thisProjectRef) =>
           val extracted: Extracted = Project.extract(state)
           val thisScope = Load.projectScope(thisProjectRef).copy(config = Select(DependencyConf))
           val name = (sbt.Keys.name in thisScope get extracted.structure.data) getOrElse thisProjectRef.project
@@ -253,7 +218,7 @@ object Plugin extends sbt.Plugin {
               val libraryDependencies = (libraryDependenciesCompile ++ libraryDependenciesTest).distinct
               val argument = TaskArgument(appConfiguration, ivyLoggingLevel, ivySbt, ivyScala, libraryDependencies, name,
                 origClassifiersModule, new UpdateConfiguration(updateConfiguration.retrieve, true, ivyLoggingLevel),
-                pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, false, dependencyClasspath,
+                pathPack, dependencyOutput, pathTarget, streams, dependencyEnableCustom, None, additionalArtifacts, false, dependencyClasspath,
                 dependencyFilter, dependencyIgnoreConfiguration, dependencyResourceFilter, dependencySkipResolved)
               commonFetchTask(argument, doFetch)
             case None =>
@@ -307,9 +272,9 @@ object Plugin extends sbt.Plugin {
         }
       }
       // copy across all entries from the original code jar
-      copy(arg, alignEntries, jarCode, jarTarget, resourceFilter, s)
+      copy(arg, alignEntries, jarCode, jarTarget, s)
       // copy across all entries from the original sources jar
-      copy(arg, alignEntries, jarSources, jarTarget, resourceFilter, s)
+      copy(arg, alignEntries, jarSources, jarTarget, s)
     } catch {
       case e: Throwable =>
         s.log.error(logPrefix(arg.name) + "Unable to align: " + e.getClass().getName() + " " + e.getMessage())
@@ -334,6 +299,7 @@ object Plugin extends sbt.Plugin {
           arg.streams.log.info(logPrefix(arg.name) + "Create consolidated jar " + arg.pathPack)
         // do default update-sbt-classifiers with libDeps
         val libDeps = arg.dependencyClasspath.flatMap(_.get(moduleID.key))
+        // Apply arg.dependencyFilter 1st time
         val extClassifiersModuleDeps = {
           val all = arg.dependencyFilter match {
             case Some(filter) => (origClassifiersModuleDeps ++ libDeps).filter(filter)
@@ -369,14 +335,24 @@ object Plugin extends sbt.Plugin {
           case _ => false
         }
         val sourceObjects = sources.map { case (configuration, moduleId, artifact, file) => (moduleId, file) }
-        val codeObjects = other.map {
+        // Apply arg.dependencyFilter 2nd time
+        val codeObjects = (arg.dependencyFilter match {
+          case Some(filter) => other.filter {
+            case (configuration, moduleId, artifact, file) =>
+              val result = filter(moduleId)
+              if (!result)
+                arg.streams.log.debug("filter " + moduleId)
+              result
+          }
+          case None => other
+        }).map {
           case (configuration, moduleId, artifact, file) if artifact.classifier == None || artifact.classifier == Some("") =>
             Some((moduleId, file))
           case _ =>
             None
         }.flatten
         // process all jars
-        other.sortBy(_._2.toString).foreach { module => arg.streams.log.debug("add " + module._2) }
+        codeObjects.sortBy(_._1.toString).foreach { case (module, file) => arg.streams.log.debug("add " + module) }
         userFunction(arg, sourceObjects, codeObjects)
         // add unprocessed modules
         if (arg.dependencyEnableCustom) {
@@ -438,6 +414,26 @@ object Plugin extends sbt.Plugin {
                   case _ =>
                     arg.streams.log.error(logPrefix(arg.name) + "Unable to aquire artifacts for module " + moduleId)
                 }
+            }
+        }
+        arg.dependencyAdditionlArtifacts.foreach {
+          case (codeArtifact, sourceCodeArtifact) =>
+            if (arg.dependencyPack) {
+              arg.streams.log.info(logPrefix(arg.name) + "Fetch additional library " +
+                (codeArtifact orElse sourceCodeArtifact map (_.getName()) getOrElse (codeArtifact, sourceCodeArtifact)))
+              codeArtifact.foreach(copyToCodePack(arg, _))
+              sourceCodeArtifact.foreach(copyToSourcePack(arg, _))
+            } else {
+              (codeArtifact, sourceCodeArtifact) match {
+                case (Some(code), Some(source)) =>
+                  val moduleId = sbt.ModuleID("Unknown", code.getName, System.currentTimeMillis().toString)
+                  userFunction(arg, Seq((moduleId, source)), Seq((moduleId, code)))
+                case (Some(code), None) =>
+                  arg.streams.log.info(logPrefix(arg.name) + "Fetch additional library " + code.getName())
+                  sbt.IO.copyFile(code, new File(arg.pathDependency, code.getName()), false)
+                case _ =>
+                  arg.streams.log.error(logPrefix(arg.name) + "Unable to aquire additional artifacts: " + (codeArtifact, sourceCodeArtifact))
+              }
             }
         }
         if (arg.dependencyPack) {
@@ -583,7 +579,7 @@ object Plugin extends sbt.Plugin {
     }
   }
   /** Copy content of jar artifact */
-  private def copy(arg: TaskArgument, alignEntries: HashSet[String], in: JarInputStream, out: JarOutputStream, resourceFilter: ZipEntry => Boolean, s: TaskStreams) {
+  private def copy(arg: TaskArgument, alignEntries: HashSet[String], in: JarInputStream, out: JarOutputStream, s: TaskStreams) {
     var entry: ZipEntry = null
     // copy across all entries from the original code jar
     var value: Int = 0
@@ -593,7 +589,7 @@ object Plugin extends sbt.Plugin {
       while (entry != null) {
         if (alignEntries(entry.getName))
           s.log.debug(logPrefix(arg.name) + "Skip, entry already in jar: " + entry.getName())
-        else if (resourceFilter(entry)) {
+        else if (arg.dependencyResourceFilter(entry)) {
           s.log.debug(logPrefix(arg.name) + "Skip, filtered " + entry)
         } else
           try {
@@ -635,7 +631,7 @@ object Plugin extends sbt.Plugin {
     // copy across all entries from the original code jar
     val jarCode = new JarInputStream(new FileInputStream(codeJar))
     try {
-      copy(arg, arg.packEntries, jarCode, arg.packWithCode, resourceFilter, arg.streams)
+      copy(arg, arg.packEntries, jarCode, arg.packWithCode, arg.streams)
       arg.packResources += codeJar.getAbsolutePath()
     } catch {
       case e: Throwable =>
@@ -651,7 +647,7 @@ object Plugin extends sbt.Plugin {
     // copy across all entries from the original code jar
     val jarSource = new JarInputStream(new FileInputStream(sourceJar))
     try {
-      copy(arg, arg.packEntries, jarSource, arg.packWithSource, resourceFilter, arg.streams)
+      copy(arg, arg.packEntries, jarSource, arg.packWithSource, arg.streams)
     } catch {
       case e: Throwable =>
         arg.streams.log.error(logPrefix(arg.name) + "Unable to merge: " + e.getClass().getName() + " " + e.getMessage())
@@ -693,6 +689,8 @@ object Plugin extends sbt.Plugin {
     dependencyEnableCustom: Boolean,
     /** The property representing artifact location. */
     dependencyArtifact: Option[java.io.File],
+    /** The property representing additional artifacts (code, source) that included into result. */
+    dependencyAdditionlArtifacts: Seq[(Option[java.io.File], Option[java.io.File])],
     /** Flag indicating whether plugin should create consolidated jar. */
     dependencyPack: Boolean,
     /** Classpath that is used to build dependency sequence. */

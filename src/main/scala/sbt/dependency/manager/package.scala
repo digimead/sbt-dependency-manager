@@ -28,6 +28,7 @@ package object manager {
   lazy val DMConf = Keys.DependencyConf
 
   // public keys
+  def dependencyAdditionalArtifacts = Keys.dependencyAdditionalArtifacts
   def dependencyEnableCustom = Keys.dependencyEnableCustom
   def dependencyFilter = Keys.dependencyFilter
   def dependencyOutput = Keys.dependencyOutput
