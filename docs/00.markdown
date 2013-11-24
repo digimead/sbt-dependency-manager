@@ -1,4 +1,8 @@
-SBT Dependency Manager [![Build Status](https://travis-ci.org/digimead/sbt-dependency-manager.png?branch=master)](https://travis-ci.org/digimead/sbt-dependency-manager)
+---
+out: index.html
+---
+
+SBT Dependency Manager
 ======================
 
 There is a short introduction on Youtube: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc). It was one of the ealist versions. <br/>
@@ -13,23 +17,9 @@ It provides an ability:
 * to fetch __all dependency jars with sources, merge them (include sbt-dependency-manager itself)__ and save to target folder
 * join all fetched artifacts to solid consolidated jar, that simplify project setup and provide rapid develoment dependency for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, *OSGi* bundles from P2 update sites and ivy/maven libraries :-)
 
-[See SBT Dependency Manager documentation](http://digimead.github.io/sbt-dependency-manager/).
+*IMPORTANT. You may fetch artifacts only for those plugins that were added via ```addSbtPlugin``` as jar files. Source code of dynamicaly compiled plugins or dependencies are not fetched. This is expected behaviour.*
 
-Authors
--------
+You may find the sample project at [src/sbt-test/dependency-manager/simple][sp]
 
-* Alexey Aksenov
-
-License
--------
-
-SBT Dependency Manager is licensed to you under the terms of
-the Apache License, version 2.0, a copy of which has been
-included in the LICENSE file.
-
-Copyright
----------
-
-Copyright © 2012-2013 Alexey B. Aksenov/Ezh. All rights reserved.
-
+[sp]: https://github.com/digimead/sbt-dependency-manager/src/sbt-test/dependency-manager/simple
 [sc]: http://eed3si9n.com/testing-sbt-plugins

@@ -1,0 +1,90 @@
+Internals
+---------
+
+You may inspect all available parameters in [Keys object](src/main/scala/sbt/dependency/manager/Keys.scala).
+
+### Options ###
+
+<table>
+  <tr>
+    <th>Name</th><th>Description</th><th>Value</th>
+  </tr>
+  <tr>
+    <td>dependencyAdditionalArtifacts</td>
+    <td>Additional artifacts that are added to results.</td>
+    <td>[Seq((Some(/path/my-jar), Some(/path/my-jar-sources)))](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L693)</td>
+  </tr>
+  <tr>
+    <td>dependencyClasspathFilter</td>
+    <td>Base filter that accepts all modules in *project classpath*.</td>
+    <td>any [ModuleFilter](https://github.com/sbt/sbt/blob/v0.13.0/ivy/src/main/scala/sbt/DependencyFilter.scala#L53)</td>
+  </tr>
+  <tr>
+    <td>dependencyEnableCustomLibraries</td>
+    <td>Add custom (like SBT itself) libraries to the result.</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>dependencyFilter</td>
+    <td>Filter for project dependencies.</td>
+    <td>[ModuleFilter based on dependencyClasspathFilter](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L58)</td>
+  </tr>
+  <tr>
+    <td>dependencyIgnoreConfigurations</td>
+    <td>Ignore configurations at all while lookup. Ignore 'test', 'compile', 'runtime' and so on...</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>dependencyLookupClasspath</td>
+    <td>Classpath that is used for building the dependency sequence.</td>
+    <td>any [Classpath](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L61)</td>
+  </tr>
+  <tr>
+    <td>dependencyOutput</td>
+    <td>Target directory for fetched artifacts. Fetch disabled if None.</td>
+    <td>any [File](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L62)</td>
+  </tr>
+  <tr>
+    <td>dependencyPackPath</td>
+    <td>Consolidated jar location.</td>
+    <td>any [File](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L54)</td>
+  </tr>
+  <tr>
+    <td>dependencyResourceFilter</td>
+    <td>Function for filtering jar content.</td>
+    <td>any [ZipEntry => Boolean](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L233)</td>
+  </tr>
+  <tr>
+    <td>dependencySkipResolved</td>
+    <td>Skip resolved dependencies with explicit artifacts which points to local resources. For example dependencies which you are added manually to your SBT project like _"a" % "b" % "c" from file://bla/bla/_...</td>
+    <td>true</td>
+  </tr>
+</table>
+
+### Tasks ###
+
+<table>
+  <tr>
+    <th>Name</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>dependencyPluginInfo</td>
+    <td>Show plugin information.</td>
+  </tr>
+  <tr>
+    <td>dependencyFetch</td>
+    <td>Fetch code jars. Save results to target directory.</td>
+  </tr>
+  <tr>
+    <td>dependencyFetchAlign</td>
+    <td>Fetch code and source jars, merge them. Save results to target directory.</td>
+  </tr>
+  <tr>
+    <td>dependencyFetchWithSources</td>
+    <td>Fetch code and source jars. Save results to target directory.</td>
+  </tr>
+  <tr>
+    <td>dependencyPack</td>
+    <td>Fetch code and source jars. Save results to consolidated jar.</td>
+  </tr>
+</table> 

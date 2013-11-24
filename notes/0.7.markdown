@@ -1,0 +1,3 @@
+The 0.7 release includes the following:
+
+* It is stable enough to make it public.

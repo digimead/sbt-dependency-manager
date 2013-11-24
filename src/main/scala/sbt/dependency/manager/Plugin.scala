@@ -50,14 +50,14 @@ object Plugin extends sbt.Plugin {
 
   lazy val defaultSettings = inConfig(Keys.DependencyConf)(Seq(
     dependencyAdditionalArtifacts := Seq(),
-    dependencyEnableCustom := true,
+    dependencyEnableCustomLibraries := true,
     dependencyPackPath <<= (target, normalizedName) map { (target, name) => target / (name + "-development.jar") },
     dependencyClasspathFilter <<= (dependencyLookupClasspath) map (cp =>
       cp.flatMap(_.get(moduleID.key)).foldLeft(moduleFilter(NothingFilter, NothingFilter, NothingFilter))((acc, m) => acc |
         moduleFilter(GlobFilter(m.organization), GlobFilter(m.name), GlobFilter(m.revision)))),
     dependencyFilter <<= dependencyClasspathFilter map (dcf => Some(dcf -
       moduleFilter(organization = GlobFilter("org.scala-lang"), name = GlobFilter("scala-library")))),
-    dependencyIgnoreConfiguration := true,
+    dependencyIgnoreConfigurations := true,
     dependencyLookupClasspath <<= Classpaths.concatDistinct(externalDependencyClasspath in Compile, externalDependencyClasspath in Test),
     dependencyOutput <<= (target in ThisProject) { path => Some(path / "deps") },
     dependencyPluginInfo <<= dependencyPluginInfoTask,
@@ -106,8 +106,8 @@ object Plugin extends sbt.Plugin {
             val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
             val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
             val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
-            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
-            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustomLibraries in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfigurations in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
             val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
             val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
             val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
@@ -140,8 +140,8 @@ object Plugin extends sbt.Plugin {
             val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
             val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
             val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
-            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
-            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustomLibraries in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfigurations in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
             val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
             val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
             val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
@@ -174,8 +174,8 @@ object Plugin extends sbt.Plugin {
             val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
             val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
             val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
-            val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
-            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+            val dependencyEnableCustom = dk.dependencyEnableCustomLibraries in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+            val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfigurations in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
             val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
             val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
             val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"
@@ -209,8 +209,8 @@ object Plugin extends sbt.Plugin {
               val ivyScala = sk.ivyScala in thisScope get extracted.structure.data getOrThrow "ivyScala is undefined"
               val pathTarget = sk.target in thisScope get extracted.structure.data getOrThrow "pathTarget is undefined"
               val updateConfiguration = sk.updateConfiguration in thisScope get extracted.structure.data getOrThrow "updateConfiguration is undefined"
-              val dependencyEnableCustom = dk.dependencyEnableCustom in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
-              val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfiguration in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
+              val dependencyEnableCustom = dk.dependencyEnableCustomLibraries in thisScope get extracted.structure.data getOrThrow "dependencyEnableCustom is undefined"
+              val dependencyIgnoreConfiguration = dk.dependencyIgnoreConfigurations in thisScope get extracted.structure.data getOrThrow "dependencyIgnoreConfiguration is undefined"
               val dependencyResourceFilter = dk.dependencyResourceFilter in thisScope get extracted.structure.data getOrThrow "dependencyResourceFilter is undefined"
               val dependencySkipResolved = dk.dependencySkipResolved in thisScope get extracted.structure.data getOrThrow "dependencySkipResolved is undefined"
               val libraryDependenciesCompile = sbt.Keys.libraryDependencies in thisScope in Compile get extracted.structure.data getOrThrow "libraryDependencies in Compile is undefined"

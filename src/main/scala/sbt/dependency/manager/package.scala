@@ -29,7 +29,7 @@ package object manager {
 
   // public keys
   def dependencyAdditionalArtifacts = Keys.dependencyAdditionalArtifacts
-  def dependencyEnableCustom = Keys.dependencyEnableCustom
+  def dependencyEnableCustom = Keys.dependencyEnableCustomLibraries
   def dependencyFilter = Keys.dependencyFilter
   def dependencyOutput = Keys.dependencyOutput
   def dependencyPackPath = Keys.dependencyPackPath

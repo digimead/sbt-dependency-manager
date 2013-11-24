@@ -1,0 +1,45 @@
+## Eclipse integration
+
+This plugin is self-sufficient for organize development process in Eclipse.
+
+1. Create or import SBT project
+2. Add [Eclipse project descriptor](#Eclipse+project+descriptor) to directory
+3. [Import][ip] project to Eclipse
+4. [Adjust][as] source folders
+5. [Fetch](Usage.html) dependencies
+6. [Add][ad] dependencies to Eclipse with **Add JARs**
+
+_Every time_ after modification of project dependencies we _repeat steps 5 and 6_.
+
+That'a all.
+
+Since I don't change dependencies every five minutes the benefits of plugin outweight any possible drawback.
+
+All these moments are covered by [5 minutes demo](Demonstration.html).
+
+### Eclipse project descriptor
+
+Add contents bellow to _.project_ file.
+
+```wiki
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+  <name>NameOfEclipseProject</name>
+  <comment></comment>
+  <projects></projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.scala-ide.sdt.core.scalabuilder</name>
+      <arguments></arguments>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.scala-ide.sdt.core.scalanature</nature>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>
+```
+
+[ip]: http://help.eclipse.org/juno/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Ftasks%2Ftasks-importproject.htm
+[as]: http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.user%2Freference%2Fref-properties-build-path.htm
+[ad]: http://www.tutorialspoint.com/eclipse/eclipse_java_build_path.htm

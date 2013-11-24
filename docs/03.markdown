@@ -1,0 +1,88 @@
+## Usage ##
+
+By default aligned jars is saved to _target/deps_. You may assign new value to _dependenciesPath_
+
+``` scala
+dependencyOutput <<= (baseDirectory) (path => Some(path / "project" / "deps"))
+```
+
+or
+
+``` scala
+DMKey.dependencyOutput in DMConf <<= (baseDirectory) (path => Some(path / "project" / "deps"))
+```
+
+_Actually "project/deps" is my favorite location for dependencies. Those dependencies keep hidden in project directory. They protected from "**clean**". They are easily available from my IDE._
+
+### Fetch all dependencies
+
+By default sbt-dependency-manager skips "org.scala-lang" and "org.scala-sbt". If you need all dependencies do
+
+``` scala
+dependencyFilter := None
+```
+
+### Filter dependencies
+
+For example, I need to fetch dependencies with source code for my project and organizations *org.scala-sbt*, *org.digimead*, *com.typesafe.sbt*.
+
+``` scala
+// common dependency filter
+  DMKey.dependencyFilter in DMConf <<= DMKey.dependencyFilter in DMConf map (df =>map(df =>
+  // plus "org.scala-sbt" modules
+  moduleFilter(organization = GlobFilter("org.scala-sbt")) |
+    // plus project plugin modules
+    moduleFilter(organization = GlobFilter("org.digimead")) |
+    moduleFilter(organization = GlobFilter("com.typesafe.sbt")))))
+```
+
+For more about module filters look at [SBT Wiki](http://www.scala-sbt.org/release/docs/Detailed-Topics/Update-Report#filter-basics)
+
+### Jar entities filter
+
+You may filter jar artifacts from populated resources. For example default filter is
+
+``` scala
+dependencyResourceFilter := resourceFilter
+def resourceFilter(entry: ZipEntry): Boolean =
+  Seq("META-INF/.*\\.SF", "META-INF/.*\\.DSA", "META-INF/.*\\.RSA").find(entry.get().toUpperCase().matches).nonEmpty
+```
+
+So we are dropped all 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA' which absolutely unneeded while developing.
+
+### Align project dependencies
+
+_My favorite task that I invoke after modification of project dependencies._
+
+1. Download all project dependencies with sources and javadocs
+
+2. Merge code jars with sources
+
+3. **Align** sources inside jars
+
+``` scala
+> dependencyFetchAlign
+```
+
+It is very useful to develop simple-build-tool plugins. Most of SBT source code are unaligned. Original sources saved in root directory of jar files, but stay binded to different packages. This situation prevents source code lookup in most common cases. This is very annoying. SBT _*-sources.jar_ was mostly useless in development before sbt-dependency-manager ;-)
+
+### Fetch project dependencies with sources to directory '123'
+
+Example of how to change option at runtime:
+
+``` scala
+> set sbt.dependency.manager.Keys.dependencyOutput in sbt.dependency.manager.Keys.DependencyConf <<= baseDirectory { (f) => Some(f / "123") }
+> dependencyFetchWithSources
+```
+
+### Get plugin information
+
+You may use _dependencyPluginInfo_ task to display plugin information.
+
+``` scala
+> dependency:dependencyPluginInfo
+[info] [Dep manager:sbt-site-manager] Name: sbt-dependency-manager
+[info] [Dep manager:sbt-site-manager] Version: 0.6.4.6
+[info] [Dep manager:sbt-site-manager] Build: Sun Oct 27 00:30:25 MSK 2013 (1382819425)
+[success] Total time: 0 s, completed 24.11.2013 11:53:54
+```

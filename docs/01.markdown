@@ -1,0 +1,20 @@
+Demonstration
+-------------
+
+[Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc) on Youtube
+
+HD quality [Simple-build-tool plugin with Eclipse in 5 Minutes](https://github.com/downloads/sbt-android-mill/sbt-android-mill-extra/EclipseSBT.mp4) - 60,5Mb
+
+It is allow to develop SBT plugins (and common Scala software too, of course) with
+
+* autocomplete
+* __sources lookup__
+* __debug SBT tasks with Eclipse debugger__ (I asked about debugging in SBT mailing list, but no one can answer. I suspect that other people using print or s.log.debug. lol ;-) )
+* implicit lookup
+* types lookup
+* refactoring support
+
+... and bunch of other standard features
+
+_PS sbt-dependency-manager obsoletes capabilities provided by sbt deliver-local + IvyDE or sbt-eclipse plugin.<br/> I am using it directly with Eclipse Scala IDE and the development process is flawless._
+
