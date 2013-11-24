@@ -1,17 +1,17 @@
 -$ exists target/deps/
-> dependency-fetch
+> dependencyFetch
 $ exists target/deps/slf4j-api-1.7.1.jar
 -$ exists target/deps/slf4j-api-1.7.1-sources.jar
 > clean
 
 -$ exists target/deps/
-> dependency-fetch-with-sources
+> dependencyFetchWithSources
 $ exists target/deps/slf4j-api-1.7.1.jar
 $ exists target/deps/slf4j-api-1.7.1-sources.jar
 > clean
 
 -$ exists target/deps/
-> dependency-fetch-align
+> dependencyFetchAlign
 $ exists target/deps/slf4j-api-1.7.1.jar
 -$ exists target/deps/slf4j-api-1.7.1-sources.jar
 > clean
