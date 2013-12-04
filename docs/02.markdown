@@ -14,7 +14,7 @@ import sbt._
 object PluginDef extends Build {
   override def projects = Seq(root)
   lazy val root = Project("plugins", file(".")) dependsOn(dm)
-  lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#VERSION")
+  lazy val dm = uri("git://github.com/digimead/sbt-dependency-manager.git#TagOrCommit")
 }
 ```
 
@@ -42,7 +42,7 @@ resolvers += Resolver.url("digimead-ivy", url("http://storage.googleapis.com/ivy
 
 ### As local build
 
-Clone this repository to your development system then do `sbt publish-local`
+Clone this repository to your development system then do `sbt publish-local`.
 
 ## Activate in your project
 
@@ -62,4 +62,6 @@ import sbt.dependency.manager._
 ... yourProjectSettings ++ DependencyManager
 ```
 
-[Imported package](src/main/scala/sbt/dependency/manager/package.scala) contains public declarations.
+[Imported package][ip] contains public declarations.
+
+[ip]: https://github.com/digimead/sbt-dependency-manager/blob/master/src/main/scala/sbt/dependency/manager/package.scala

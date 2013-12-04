@@ -6,7 +6,7 @@ SBT Dependency Manager
 ======================
 
 There is a short introduction on Youtube: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc). It was one of the ealist versions. <br/>
-There is a [sample project](src/sbt-test/dependency-manager/simple). Please, overview `test` file which contains interactive example in [Scripted format][sc].
+There is a [sample project][sp]. Please, overview `test` file which contains interactive example in [Scripted format][sc].
 
 What is it? You may fetch [SBT](https://github.com/sbt/sbt "Simple Build Tool") project artifacts, compose jars with source code, *align* sources inside jars for your favorite IDE
 
@@ -19,13 +19,11 @@ It provides an ability:
 
 *IMPORTANT. You may fetch artifacts only for those plugins that were added via ```addSbtPlugin``` as jar files. Source code of dynamicaly compiled plugins or dependencies are not fetched. This is expected behaviour.*
 
-You may find the sample project at [src/sbt-test/dependency-manager/simple][sp]
-
 <hr/>
 
 > [Latest stable version $version$]($stable$)
 
 > [Latest development version $version$]($development$)
 
-[sp]: https://github.com/digimead/sbt-dependency-manager/src/sbt-test/dependency-manager/simple
 [sc]: http://eed3si9n.com/testing-sbt-plugins
+[sp]: https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple

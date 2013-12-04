@@ -2,7 +2,7 @@ SBT Dependency Manager [![Build Status](https://travis-ci.org/digimead/sbt-depen
 ======================
 
 There is a short introduction on Youtube: [Simple-build-tool plugin with Eclipse in 5 Minutes](http://youtu.be/3K8knvkVAyc). It was one of the ealist versions. <br/>
-There is a [sample project](src/sbt-test/dependency-manager/simple). Please, overview `test` file which contains interactive example in [Scripted format][sc].
+There is a [sample project][sp]. Please, overview `test` file which contains interactive example in [Scripted format][sc].
 
 What is it? You may fetch [SBT](https://github.com/sbt/sbt "Simple Build Tool") project artifacts, compose jars with source code, *align* sources inside jars for your favorite IDE
 
@@ -26,6 +26,7 @@ License
 SBT Dependency Manager is licensed to you under the terms of
 the Apache License, version 2.0, a copy of which has been
 included in the LICENSE file.
+Please check the individual source files for details.
 
 Copyright
 ---------
@@ -33,3 +34,4 @@ Copyright
 Copyright © 2012-2013 Alexey B. Aksenov/Ezh. All rights reserved.
 
 [sc]: http://eed3si9n.com/testing-sbt-plugins
+[sp]: https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple
