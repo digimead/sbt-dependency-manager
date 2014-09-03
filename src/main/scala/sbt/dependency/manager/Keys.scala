@@ -28,8 +28,6 @@ object Keys {
   def DependencyConf = config("dependency") hide
 
   lazy val dependencyAdditionalArtifacts = TaskKey[Seq[(Option[java.io.File], Option[java.io.File])]]("dependencyAdditionalArtifacts", "Additional artifacts that are added to results.")
-  lazy val dependencyClasspathFilter = TaskKey[ModuleFilter]("dependencyPredefinedClasspathFilter", "Base filter that accepts all modules in project classpath.")
-  lazy val dependencyEnableCustomLibraries = SettingKey[Boolean]("dependencyEnableCustomLibraries", "Add custom(unknown) libraries to the result.")
   lazy val dependencyFilter = TaskKey[Option[ModuleFilter]]("dependencyFilter", "Filter for project dependencies.")
   lazy val dependencyIgnoreConfigurations = SettingKey[Boolean]("dependencyIgnoreConfigurations", "Ignore configurations while lookup like 'test', for example.")
   lazy val dependencyLookupClasspath = TaskKey[Classpath]("dependencyLookupClasspath", "Classpath that is used for building the dependency sequence.")

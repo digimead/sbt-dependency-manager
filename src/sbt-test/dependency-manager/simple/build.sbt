@@ -1,6 +1,9 @@
+import sbt.application._
 import sbt.dependency.manager._
 
 DependencyManager
+
+Application
 
 name := "Simple"
 

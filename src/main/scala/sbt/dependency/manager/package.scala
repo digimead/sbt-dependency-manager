@@ -19,6 +19,9 @@
 
 package sbt.dependency
 
+import sbt.Keys._
+import sbt._
+
 package object manager {
   /** Entry point for plugin in user's project */
   lazy val DependencyManager = Plugin.defaultSettings
@@ -28,9 +31,24 @@ package object manager {
   lazy val DMConf = Keys.DependencyConf
 
   // public keys
-  def dependencyAdditionalArtifacts = Keys.dependencyAdditionalArtifacts
-  def dependencyEnableCustom = Keys.dependencyEnableCustomLibraries
-  def dependencyFilter = Keys.dependencyFilter
-  def dependencyOutput = Keys.dependencyOutput
-  def dependencyPackPath = Keys.dependencyPackPath
+  /** Filter that accept all modules. */
+  def DMFilterAcceptAll = (streams) map { _ ⇒
+    val filter: Option[ModuleFilter] = Some(moduleFilter(AllPassFilter, AllPassFilter, AllPassFilter))
+    filter
+  }
+  /** Filter that accept all modules except Scala library. */
+  def DMFilterAcceptAllExceptScala = (streams) map { _ ⇒
+    val filter: Option[ModuleFilter] = Some(moduleFilter(AllPassFilter, AllPassFilter, AllPassFilter) -
+      moduleFilter(organization = GlobFilter("org.scala-lang"), name = GlobFilter("scala-library")))
+    filter
+  }
+  /** Filter that accept only modules from libraryDependencies + dependencyLookupClasspath except Scala library. */
+  def DMFilterAcceptKnown = (libraryDependencies in Compile, libraryDependencies in Test, DMKey.dependencyLookupClasspath in DMConf) map {
+    (libraryDependenciesCompile, libraryDependenciesTest, dependencyLookupClasspath) ⇒
+      val acceptKnown = (dependencyLookupClasspath.flatMap(_.get(moduleID.key)) ++ libraryDependenciesCompile ++ libraryDependenciesTest).distinct.
+        foldLeft(moduleFilter(NothingFilter, NothingFilter, NothingFilter))((acc, m) ⇒ acc |
+          moduleFilter(GlobFilter(m.organization), GlobFilter(m.name), GlobFilter(m.revision)))
+      val filter: Option[ModuleFilter] = Some(acceptKnown - moduleFilter(organization = GlobFilter("org.scala-lang"), name = GlobFilter("scala-library")))
+      filter
+  }
 }
