@@ -15,6 +15,8 @@ It provides an ability:
 
 [See SBT Dependency Manager documentation](http://digimead.github.io/sbt-dependency-manager/).
 
+__Required Java 6 or higher__
+
 Authors
 -------
 
