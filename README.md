@@ -15,6 +15,8 @@ It provides an ability:
 
 [See SBT Dependency Manager documentation](http://digimead.github.io/sbt-dependency-manager/).
 
+__Required Java 6 or higher__
+
 Authors
 -------
 
@@ -31,7 +33,7 @@ Please check the individual source files for details.
 Copyright
 ---------
 
-Copyright © 2012-2013 Alexey B. Aksenov/Ezh. All rights reserved.
+Copyright © 2012-2014 Alexey B. Aksenov/Ezh. All rights reserved.
 
 [sc]: http://eed3si9n.com/testing-sbt-plugins
 [sp]: https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple
