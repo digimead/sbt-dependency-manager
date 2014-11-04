@@ -2,7 +2,7 @@
  * sbt-dependency-manager - fetch and merge byte code and source code jars, align broken sources within jars.
  * For example, it is allow easy source code lookup for IDE while developing SBT plugins (not only).
  *
- * Copyright (c) 2012-2013 Alexey Aksenov ezh@ezh.msk.ru
+ * Copyright (c) 2012-2014 Alexey Aksenov ezh@ezh.msk.ru
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ object Keys {
   lazy val dependencyIgnoreConfigurations = SettingKey[Boolean]("dependencyIgnoreConfigurations", "Ignore configurations while lookup like 'test', for example.")
   lazy val dependencyLookupClasspath = TaskKey[Classpath]("dependencyLookupClasspath", "Classpath that is used for building the dependency sequence.")
   lazy val dependencyOutput = SettingKey[Option[java.io.File]]("dependencyOutput", "Target directory for fetched artifacts. Fetch disabled if None.")
+  lazy val dependencyOverwrite = SettingKey[Boolean]("dependencyOverwrite", "Overwrite exists artifacts.")
   lazy val dependencyPackPath = TaskKey[java.io.File]("dependencyPackPath", "Consolidated jar location.")
   lazy val dependencyPluginInfo = TaskKey[Unit]("dependencyPluginInfo", "Show plugin information.")
-  lazy val dependencyResourceFilter = SettingKey[ZipEntry => Boolean]("dependencyResourceFilter", "Function for filtering jar content.")
+  lazy val dependencyResourceFilter = SettingKey[ZipEntry ⇒ Boolean]("dependencyResourceFilter", "Function for filtering jar content.")
   lazy val dependencySkipResolved = SettingKey[Boolean]("dependencySkipResolved", "Skip resolved dependencies with explicit artifacts which points to local resources.")
   lazy val dependencyTaskFetch = TaskKey[Unit]("dependencyFetch", "Fetch code jars. Save results to target directory.")
   lazy val dependencyTaskFetchAlign = TaskKey[Unit]("dependencyFetchAlign", "Fetch code and source jars, merge them. Save results to target directory.")
