@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SBT Dependency Manager — Combined Pages</title>
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css"/>
+    <link rel="stylesheet" href="css/sheet.css" type="text/css"/>
+    <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen, projection"/>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script type="text/javascript" src="js/jquery.collapse.js"></script>
+    <script type="text/javascript" src="js/jquery.jsonp-2.4.0.min.js"></script>
+    <script type="text/javascript" src="js/tsort.min.js"></script>
+    <script type="text/javascript">
+      var artifacts = "sbt-dependency-manager".split(/\s*,\s*/).sort();
+      var artifact = new Object();
+      artifact.user = 'digimead';
+      artifact.project = 'sbt-dependency-manager';
+    </script>
+    <script type="text/javascript" src="http://commondatastorage.googleapis.com/digimead/digimead.js"></script>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta http-equiv="Content-Type" content="text/html"/>
+<script type="text/javascript" src="js/prettify/prettify.js"></script>
+<script type="text/javascript" src="js/prettify/lang-scala.js"></script>
+<script type="text/javascript" src="js/prettify/lang-wiki.js"></script>
+<link rel="stylesheet" href="css/prettify.css" type="text/css"/>
+<script type='text/javascript'>
+  //<![CDATA[
+    window.onload=function() { prettyPrint(); };
+  //]]>
+</script>
+  </head>
+  <body class="color_scheme-redmond">
+    <header>
+      <h3>
+        Digimead Artifacts
+      </h3>
+      <a id="contact">
+        <span data-hover="Feel free to contact.">
+          You are welcome ;)))
+        </span>
+      </a>
+    </header>
+    <div style="display: none;">
+      <!-- / deps definition -->
+      <div id="depsForArtifact">
+        <div id="depsName"></div>
+        <div id="depsCentral">
+          <span>
+            Maven Central:
+          </span>
+          <span id="depsContentCentralAvailable" style="display: none;">
+            available
+          </span>
+          <span id="depsContentCentralNotAvailable" style="display: none;">
+            not available
+          </span>
+        </div>
+        <div id="depsIvy" style="visibility: hidden;">
+          <span>
+            From Digimead Ivy:
+          </span>
+          <span id="jar">
+            <a>
+              jar
+            </a>
+          </span>
+          <span id="source" style="display: none;">
+            |
+            <a>
+              source
+            </a>
+          </span>
+          <span id="doc" style="display: none;">
+            |
+            <a>
+              doc
+            </a>
+          </span>
+        </div>
+        <div id="depsMaven" style="visibility: hidden;">
+          <span>
+            From Digimead Maven:
+          </span>
+          <span id="jar">
+            <a>
+              jar
+            </a>
+          </span>
+          <span id="source" style="display: none;">
+            |
+            <a>
+              source
+            </a>
+          </span>
+          <span id="doc" style="display: none;">
+            |
+            <a>
+              doc
+            </a>
+          </span>
+        </div>
+        <div id="depsAPI">
+          <a href="#" title="Open artifact API in a new window.">
+            API
+          </a>
+        </div>
+      </div>
+      <div id="depsLibrary">
+        <ul>
+          <li>
+            <a href="#depsSBT">
+              SBT
+            </a>
+          </li>
+          <li>
+            <a href="#depsMaven">
+              Maven
+            </a>
+          </li>
+          <li>
+            <a href="#depsIvy">
+              Ivy
+            </a>
+          </li>
+          <li>
+            <a href="#depsGrape">
+              Grape
+            </a>
+          </li>
+          <li>
+            <a href="#depsGradle">
+              Gradle
+            </a>
+          </li>
+          <li>
+            <a href="#depsBuildr">
+              Buildr
+            </a>
+          </li>
+        </ul>
+        <div id="depsSBT">
+          <pre>libraryDependencies += "###ORG###" % "###ARTIFACT###" % "###VERSION###"</pre>
+        </div>
+        <div id="depsMaven">
+          <pre>&lt;dependency&gt;&#x000A;  &lt;groupId&gt;###ORG###&lt;/groupId&gt;&#x000A;  &lt;artifactId&gt;###ARTIFACT###&lt;/artifactId&gt;&#x000A;  &lt;version&gt;###VERSION###&lt;/version&gt;&#x000A;&lt;/dependency&gt;</pre>
+        </div>
+        <div id="depsIvy">
+          <pre>&lt;dependency org=&quot;###ORG###&quot; name=&quot;###ARTIFACT###&quot; rev=&quot;###VERSION###&quot; /&gt;</pre>
+        </div>
+        <div id="depsGrape">
+          <pre>@Grapes(&#x000A;    @Grab(group='###ORG###', module='###ARTIFACT###', version='###VERSION###')&#x000A;)</pre>
+        </div>
+        <div id="depsGradle">
+          <pre>'###ORG###:###ARTIFACT###:###VERSION###'</pre>
+        </div>
+        <div id="depsBuildr">
+          <pre>'###ORG###:###ARTIFACT###:jar:###VERSION###'</pre>
+        </div>
+      </div>
+      <div id="depsPlugin">
+        <br/>
+        <div>
+          You may add Maven repository:
+        </div>
+        <pre>resolvers += "digimead-maven" at "http://storage.googleapis.com/maven.repository.digimorg/"</pre>
+        <div>
+          Or you may add Ivy repository:
+        </div>
+        <pre>resolvers += Resolver.url("digimead-ivy", url("http://storage.googleapis.com/ivy.repository.digimead.org/"))(Resolver.defaultIvyPatterns)</pre>
+        <div>
+          And then
+        </div>
+        <pre>addSbtPlugin("###ORG###" % "###ARTIFACT###" % "###VERSION###")</pre>
+        <div>
+          Or you may create a
+        </div>
+        <pre>project/project/Build.scala</pre>
+        <div>
+          file that looks like the following:
+        </div>
+        <pre class="prettyprint lang-scala">import sbt._&#x000A;object PluginDef extends Build {&#x000A;  override def projects = Seq(root)&#x000A;  lazy val root = Project("plugins", file(".")) dependsOn(plugin)&#x000A;  lazy val plugin = uri("git://github.com/###ORG###/###ARTIFACT###.git#TagOrCommit")&#x000A;}</pre>
+        <div>
+          You may find more information about Build.scala in SBT documentation
+        </div>
+      </div>
+      <!-- / dialog_contact definition -->
+      <div id="dialog_contacts">
+        <div>
+          <h3>
+            <span>
+              Mr.
+            </span>
+            Alexey Aksenov
+            <span>
+              aka
+            </span>
+            ЁЖ
+          </h3>
+          <img id="photo" src="http://commondatastorage.googleapis.com/ezhik/simple.png"/>
+          <img id="avatar" src="http://commondatastorage.googleapis.com/ezhik/avatar.png"/>
+          <table>
+            <tr id="priMail">
+              <td>
+                Primary email
+              </td>
+              <td id="data"></td>
+            </tr>
+            <tr id="secMail">
+              <td>
+                Secondary email
+              </td>
+              <td id="data"></td>
+            </tr>
+            <tr id="skype">
+              <td>
+                Skype
+              </td>
+              <td></td>
+            </tr>
+            <tr id="icq">
+              <td>
+                ICQ
+              </td>
+              <td id="data"></td>
+            </tr>
+            <tr id="ru_ph">
+              <td>
+                Russian phone
+              </td>
+              <td id="data"></td>
+            </tr>
+            <tr id="uk_ph">
+              <td>
+                United Kindom phone
+              </td>
+              <td id="data"></td>
+            </tr>
+            <tr id="ww">
+              <td>
+                WorldWide SIP
+              </td>
+              <td id="data"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <!-- / dialog_error definition -->
+      <div id="dialog_error">
+        <p id="error">
+          <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        </p>
+      </div>
+      <!-- / dialog_version definition -->
+      <div id="dialog_version" class="dialog_window" title="Artifact information">
+        <div id="API" style="visibility: hidden;">
+          <button>
+            Open API documentation in new tab/window
+          </button>
+        </div>
+        <div id="deps"></div>
+        <div id="depsRepoHead">
+          Repositories:
+        </div>
+        <div id="depsRepoEntry">
+          Digimead Ivy located at
+          <i>
+            http://storage.googleapis.com/ivy.repository.digimead.org/
+          </i>
+        </div>
+        <div id="depsRepoEntry">
+          Digimead Maven located at
+          <i>
+            http://storage.googleapis.com/maven.repository.digimead.org/
+          </i>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+<a class="page prev nav" title="Contents in Depth" href="Contents+in+Depth.html">
+  <span class="space">
+    &nbsp;
+  </span>
+  <span class="flip">
+    ❧
+  </span>
+</a>
+      <div id="main">
+        <div class="top">
+  <div class="title">
+    <span>SBT Dependency Manager
+    - Combined Pages
+</span>
+    <div class="logo">
+      <img src="http://commondatastorage.googleapis.com/digimead/sbt-dependency-manager.png" style="width: 100px;"/>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="left">
+      <a href="Contents+in+Depth.html">Contents in Depth</a>
+      <span class="arrow">&#8678;</span>
+      <span>Previous Page</span>
+    </div>
+    <div class="center">
+      
+    </div>
+  </div>
+</div>
+<div class="content">
+  <div class="toc">
+    <div class="tocwrapper show">
+  <h4 class="toctitle">Contents</h4>
+  <div class="tocbody">
+    <div><a href="#SBT+Dependency+Manager">SBT Dependency Manager</a></div>
+    <ol class="toc"> <li><div><a href="#Demonstration">Demonstration</a></div></li><li><div><a href="#Adding+to+your+project">Adding to your project</a></div></li><li><div><a href="#Usage">Usage</a></div></li><li><div><a href="#Internals">Internals</a></div></li><li><div><a href="#Eclipse+integration">Eclipse integration</a></div></li> </ol>
+  </div>
+</div>
+
+  </div>
+  <div class="generated">
+<h1 id="SBT+Dependency+Manager">SBT Dependency Manager<a href="#SBT+Dependency+Manager" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>There is a short introduction on Youtube: <a href="http://youtu.be/3K8knvkVAyc">Simple-build-tool plugin with Eclipse in 5 Minutes</a>. It was one of the ealist versions. <br/>
+There is a <a href="https://github.com/digimead/sbt-dependency-manager/tree/master/src/sbt-test/dependency-manager/simple">sample project</a>. Please, overview <code>test</code> file which contains interactive example in <a href="http://eed3si9n.com/testing-sbt-plugins">Scripted format</a>.
+</p><p>What is it? You may fetch <a href="https://github.com/sbt/sbt" title="Simple Build Tool">SBT</a> project artifacts, compose jars with source code, <em>align</em> sources inside jars for your favorite IDE
+</p><p>It provides an ability:
+</p><ul><li>to fetch <strong>all dependency jars (include sbt-dependency-manager itself)</strong> to target folder
+</li><li>to fetch <strong>all dependency jars with sources (include sbt-dependency-manager itself)</strong> to target folder
+</li><li>to fetch <strong>all dependency jars with sources, merge them (include sbt-dependency-manager itself)</strong> and save to target folder
+</li><li>join all fetched artifacts to solid consolidated jar, that simplify project setup and provide rapid develoment dependency for 3rd party. Especially when you have tons of dependencies from different sources: mix of local artifacts, <em>OSGi</em> bundles from P2 update sites and ivy/maven libraries :-)
+</li></ul><p><em>IMPORTANT. You may fetch artifacts only for those plugins that were added via <code>`addSbtPlugin</code>` as jar files. Source code of dynamicaly compiled plugins or dependencies are not fetched. This is expected behaviour.</em>
+</p><hr/>
+<blockquote><p><a href="$stable$">Latest stable version $version$</a>
+</p></blockquote><blockquote><p><a href="$development$">Latest development version $version$</a>
+</p></blockquote><h2 id="Demonstration">Demonstration<a href="#Demonstration" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p><a href="http://youtu.be/3K8knvkVAyc">Simple-build-tool plugin with Eclipse in 5 Minutes</a> on Youtube
+</p><p>HD quality <a href="https://github.com/downloads/sbt-android-mill/sbt-android-mill-extra/EclipseSBT.mp4">Simple-build-tool plugin with Eclipse in 5 Minutes</a> - 60,5Mb
+</p><p>It is allow to develop SBT plugins (and common Scala software too, of course) with
+</p><ul><li>autocomplete
+</li><li><strong>sources lookup</strong>
+</li><li><strong>debug SBT tasks with Eclipse debugger</strong> (I asked about debugging in SBT mailing list, but no one can answer. I suspect that other people using print or s.log.debug. lol ;-) )
+</li><li>implicit lookup
+</li><li>types lookup
+</li><li>refactoring support
+</li></ul><p>... and bunch of other standard features
+</p><p><em>PS sbt-dependency-manager obsoletes capabilities provided by sbt deliver-local + IvyDE or sbt-eclipse plugin.<br/> I am using it directly with Eclipse Scala IDE and the development process is flawless.</em>
+</p><h2 id="Adding+to+your+project">Adding to your project<a href="#Adding+to+your+project" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><h3 id="Via+interactive+build">Via interactive build<a href="#Via+interactive+build" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Create a
+</p><ul><li><em>project/plugins/project/Build.scala</em> - for older simple-build-tool
+</li><li><em>project/project/Build.scala</em> - for newer simple-build-tool
+</li></ul><p>file that looks like the following:
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">import sbt._
+object PluginDef extends Build {
+  override def projects = Seq(root)
+  lazy val root = Project(&quot;plugins&quot;, file(&quot;.&quot;)) dependsOn(dm)
+  lazy val dm = uri(&quot;git://github.com/digimead/sbt-dependency-manager.git#TagOrCommit&quot;)
+}
+</code></pre><p>You may find more information about Build.scala in <a href="http://www.scala-sbt.org/release/docs/Extending/Plugins">SBT documentation</a>
+</p><h3 id="As+published+jar+artifact">As published jar artifact<a href="#As+published+jar+artifact" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Add to your <em>project/plugins.sbt</em>
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">addSbtPlugin(&quot;org.digimead&quot; % &quot;sbt-dependency-manager&quot; % &quot;VERSION&quot;)
+</code></pre><p>Maven repository:
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">resolvers += &quot;digimead-maven&quot; at &quot;http://storage.googleapis.com/maven.repository.digimead.org/&quot;
+</code></pre><p>Ivy repository:
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">resolvers += Resolver.url(&quot;digimead-ivy&quot;, url(&quot;http://storage.googleapis.com/ivy.repository.digimead.org/&quot;))(Resolver.defaultIvyPatterns)
+</code></pre><h3 id="As+local+build">As local build<a href="#As+local+build" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Clone this repository to your development system then do <code>sbt publish-local</code>.
+</p><h2 id="Activate+in+your+project">Activate in your project<a href="#Activate+in+your+project" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>For <em>build.sbt</em>, simply add:
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">import sbt.dependency.manager._
+
+DependencyManager
+</code></pre><p>For <em>Build.scala</em>:
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">import sbt.dependency.manager._
+
+... yourProjectSettings ++ DependencyManager
+</code></pre><p><a href="https://github.com/digimead/sbt-dependency-manager/blob/master/src/main/scala/sbt/dependency/manager/package.scala">Imported package</a> contains public declarations.
+</p><h2 id="Usage">Usage<a href="#Usage" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>By default aligned jars is saved to <em>target/deps</em>. You may assign new value to <em>dependenciesPath</em>
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">dependencyOutput &lt;&lt;= (baseDirectory) (path =&gt; Some(path / &quot;project&quot; / &quot;deps&quot;))
+</code></pre><p>or
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">DMKey.dependencyOutput in DMConf &lt;&lt;= (baseDirectory) (path =&gt; Some(path / &quot;project&quot; / &quot;deps&quot;))
+</code></pre><p><em>Actually &quot;project/deps&quot; is my favorite location for dependencies. Those dependencies keep hidden in project directory. They protected from &quot;<strong>clean</strong>&quot;. They are easily available from my IDE.</em>
+</p><h3 id="Fetch+all+dependencies">Fetch all dependencies<a href="#Fetch+all+dependencies" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>By default sbt-dependency-manager skips &quot;org.scala-lang&quot; and &quot;org.scala-sbt&quot;. If you need all dependencies do
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">dependencyFilter := None
+</code></pre><h3 id="Filter+dependencies">Filter dependencies<a href="#Filter+dependencies" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>For example, I need to fetch dependencies with source code for my project and organizations <em>org.scala-sbt</em>, <em>org.digimead</em>, <em>com.typesafe.sbt</em>.
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">// common dependency filter
+  DMKey.dependencyFilter in DMConf &lt;&lt;= DMKey.dependencyFilter in DMConf map (df =&gt;map(df =&gt;
+  // plus &quot;org.scala-sbt&quot; modules
+  moduleFilter(organization = GlobFilter(&quot;org.scala-sbt&quot;)) |
+    // plus project plugin modules
+    moduleFilter(organization = GlobFilter(&quot;org.digimead&quot;)) |
+    moduleFilter(organization = GlobFilter(&quot;com.typesafe.sbt&quot;)))))
+</code></pre><p>For more about module filters look at <a href="http://www.scala-sbt.org/release/docs/Detailed-Topics/Update-Report#filter-basics">SBT Wiki</a>
+</p><h3 id="Jar+entities+filter">Jar entities filter<a href="#Jar+entities+filter" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>You may filter jar artifacts from populated resources. For example default filter is
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">dependencyResourceFilter := resourceFilter
+def resourceFilter(entry: ZipEntry): Boolean =
+  Seq(&quot;META-INF/.*\\.SF&quot;, &quot;META-INF/.*\\.DSA&quot;, &quot;META-INF/.*\\.RSA&quot;).find(entry.get().toUpperCase().matches).nonEmpty
+</code></pre><p>So we are dropped all 'META-INF/<em>.SF', 'META-INF/</em>.DSA', 'META-INF/*.RSA' which absolutely unneeded while developing.
+</p><h3 id="Align+project+dependencies">Align project dependencies<a href="#Align+project+dependencies" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p><em>My favorite task that I invoke after modification of project dependencies.</em>
+</p><ol><li>Download all project dependencies with sources and javadocs
+</li><li>Merge code jars with sources
+</li><li><strong>Align</strong> sources inside jars
+</li></ol><pre class="prettyprint linenums"><code class="prettyprint lang-scala">&gt; dependencyFetchAlign
+</code></pre><p>It is very useful to develop simple-build-tool plugins. Most of SBT source code are unaligned. Original sources saved in root directory of jar files, but stay binded to different packages. This situation prevents source code lookup in most common cases. This is very annoying. SBT <em>*-sources.jar</em> was mostly useless in development before sbt-dependency-manager ;-)
+</p><h3 id="Fetch+project+dependencies+with+sources+to+directory+%27123%27">Fetch project dependencies with sources to directory '123'<a href="#Fetch+project+dependencies+with+sources+to+directory+%27123%27" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Example of how to change option at runtime:
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">&gt; set sbt.dependency.manager.Keys.dependencyOutput in sbt.dependency.manager.Keys.DependencyConf &lt;&lt;= baseDirectory { (f) =&gt; Some(f / &quot;123&quot;) }
+&gt; dependencyFetchWithSources
+</code></pre><h3 id="Get+plugin+information">Get plugin information<a href="#Get+plugin+information" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>You may use <em>dependencyPluginInfo</em> task to display plugin information.
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-scala">&gt; dependency:dependencyPluginInfo
+[info] [Dep manager:sbt-site-manager] Name: sbt-dependency-manager
+[info] [Dep manager:sbt-site-manager] Version: 0.6.4.6
+[info] [Dep manager:sbt-site-manager] Build: Sun Oct 27 00:30:25 MSK 2013 (1382819425)
+[success] Total time: 0 s, completed 24.11.2013 11:53:54
+</code></pre><h2 id="Internals">Internals<a href="#Internals" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>You may inspect all available parameters in <a href="src/main/scala/sbt/dependency/manager/Keys.scala">Keys object</a>.
+</p><h3 id="Options">Options<a href="#Options" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><table>
+  <tr>
+    <th>Name</th><th>Description</th><th>Value</th>
+  </tr>
+  <tr>
+    <td>dependencyAdditionalArtifacts</td>
+    <td>Additional artifacts that are added to results.</td>
+    <td>[Seq((Some(/path/my-jar), Some(/path/my-jar-sources)))](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L693)</td>
+  </tr>
+  <tr>
+    <td>dependencyClasspathFilter</td>
+    <td>Base filter that accepts all modules in *project classpath*.</td>
+    <td>any [ModuleFilter](https://github.com/sbt/sbt/blob/v0.13.0/ivy/src/main/scala/sbt/DependencyFilter.scala#L53)</td>
+  </tr>
+  <tr>
+    <td>dependencyEnableCustomLibraries</td>
+    <td>Add custom (like SBT itself) libraries to the result.</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>dependencyFilter</td>
+    <td>Filter for project dependencies.</td>
+    <td>[ModuleFilter based on dependencyClasspathFilter](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L58)</td>
+  </tr>
+  <tr>
+    <td>dependencyIgnoreConfigurations</td>
+    <td>Ignore configurations at all while lookup. Ignore 'test', 'compile', 'runtime' and so on...</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>dependencyLookupClasspath</td>
+    <td>Classpath that is used for building the dependency sequence.</td>
+    <td>any [Classpath](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L61)</td>
+  </tr>
+  <tr>
+    <td>dependencyOutput</td>
+    <td>Target directory for fetched artifacts. Fetch disabled if None.</td>
+    <td>any [File](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L62)</td>
+  </tr>
+  <tr>
+    <td>dependencyPackPath</td>
+    <td>Consolidated jar location.</td>
+    <td>any [File](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L54)</td>
+  </tr>
+  <tr>
+    <td>dependencyResourceFilter</td>
+    <td>Function for filtering jar content.</td>
+    <td>any [ZipEntry => Boolean](https://github.com/digimead/sbt-dependency-manager/blob/ed7aecf75ca42cb4b424c91427a788800f3cc08e/src/main/scala/sbt/dependency/manager/Plugin.scala#L233)</td>
+  </tr>
+  <tr>
+    <td>dependencySkipResolved</td>
+    <td>Skip resolved dependencies with explicit artifacts which points to local resources. For example dependencies which you are added manually to your SBT project like _"a" % "b" % "c" from file://bla/bla/_...</td>
+    <td>true</td>
+  </tr>
+</table><h3 id="Tasks">Tasks<a href="#Tasks" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><table>
+  <tr>
+    <th>Name</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>dependencyPluginInfo</td>
+    <td>Show plugin information.</td>
+  </tr>
+  <tr>
+    <td>dependencyFetch</td>
+    <td>Fetch code jars. Save results to target directory.</td>
+  </tr>
+  <tr>
+    <td>dependencyFetchAlign</td>
+    <td>Fetch code and source jars, merge them. Save results to target directory.</td>
+  </tr>
+  <tr>
+    <td>dependencyFetchWithSources</td>
+    <td>Fetch code and source jars. Save results to target directory.</td>
+  </tr>
+  <tr>
+    <td>dependencyPack</td>
+    <td>Fetch code and source jars. Save results to consolidated jar.</td>
+  </tr>
+</table><h2 id="Eclipse+integration">Eclipse integration<a href="#Eclipse+integration" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>This plugin is self-sufficient for organize development process in Eclipse.
+</p><ol><li>Create or import SBT project
+</li><li>Add <a href="#Eclipse+project+descriptor">Eclipse project descriptor</a> to directory
+</li><li><a href="http://help.eclipse.org/juno/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Ftasks%2Ftasks-importproject.htm">Import</a> project to Eclipse
+</li><li><a href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.user%2Freference%2Fref-properties-build-path.htm">Adjust</a> source folders
+</li><li><a href="Usage.html">Fetch</a> dependencies
+</li><li><a href="http://www.tutorialspoint.com/eclipse/eclipse_java_build_path.htm">Add</a> dependencies to Eclipse with <strong>Add JARs</strong>
+</li></ol><p><em>Every time</em> after modification of project dependencies we <em>repeat steps 5 and 6</em>.
+</p><p>That'a all.
+</p><p>Since I don't change dependencies every five minutes the benefits of plugin outweight any possible drawback.
+</p><p>All these moments are covered by <a href="Demonstration.html">5 minutes demo</a>.
+</p><h3 id="Eclipse+project+descriptor">Eclipse project descriptor<a href="#Eclipse+project+descriptor" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Add contents bellow to <em>.project</em> file.
+</p><pre class="prettyprint linenums"><code class="prettyprint lang-wiki">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;projectDescription&gt;
+  &lt;name&gt;NameOfEclipseProject&lt;/name&gt;
+  &lt;comment&gt;&lt;/comment&gt;
+  &lt;projects&gt;&lt;/projects&gt;
+  &lt;buildSpec&gt;
+    &lt;buildCommand&gt;
+      &lt;name&gt;org.scala-ide.sdt.core.scalabuilder&lt;/name&gt;
+      &lt;arguments&gt;&lt;/arguments&gt;
+    &lt;/buildCommand&gt;
+  &lt;/buildSpec&gt;
+  &lt;natures&gt;
+    &lt;nature&gt;org.scala-ide.sdt.core.scalanature&lt;/nature&gt;
+    &lt;nature&gt;org.eclipse.jdt.core.javanature&lt;/nature&gt;
+  &lt;/natures&gt;
+&lt;/projectDescription&gt;
+</code></pre>
+  </div>
+</div>
+
+      </div>
+      <div id="menu">
+        <h3>
+          Available parts
+        </h3>
+      </div>
+      <div id="interact">
+        <div id="currentState">
+          <h3>
+            Current state
+          </h3>
+          <a href="https://travis-ci.org/digimead/sbt-dependency-manager">
+            <img src="https://travis-ci.org/digimead/sbt-dependency-manager.png"/>
+          </a>
+        </div>
+        <div id="collaborate">
+          <h3>
+            I Like It
+          </h3>
+          <table>
+            <tr>
+              <td>
+                <div id="google">
+<div class="g-plusone" data-size="tall"></div>
+<script type='text/javascript'>
+  //<![CDATA[
+    window.___gcfg = {lang: "en"};
+    (function() {
+      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+      po.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+    })();
+  //]]>
+</script>
+                </div>
+              </td>
+              <td>
+                <div id="facebook">
+<div id="fb-root"></div>
+<script type='text/javascript'>
+  //<![CDATA[
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en/all.js#xfbml=1";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  //]]>
+</script>
+<div class="fb-like" data-href="https://developers.facebook.com/docs/plugins/" data-layout="box_count" data-action="recommend" data-show-faces="true" data-share="true"></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div id="versions">
+          <h3>
+            Versions
+          </h3>
+        </div>
+        <div id="correctness">
+          <h3>
+            Correctness
+          </h3>
+          <script type="text/javascript" src="js/orphus.js"></script>
+          <a href="http://orphus.ru" id="orphus" target="_blank" title="Orphus system">
+            <img alt="Orphus system" src="img/orphus.gif" border="0" width="121" height="21"/>
+          </a>
+          <div id="message">
+            Select spelling error with your mouse and press Ctrl+Enter
+          </div>
+          <div id="description">
+            This information is provided in the hope that it will be useful and help people with their first steps, even if it is written in broken English... Would you have preferred well written Russian? :-) Please, correct it, if you find something inappropriate.
+          </div>
+        </div>
+      </div>
+    </div>
+    <a class="fork nav" href="http://github.com/digimead/sbt-dependency-manager">
+      <img src="img/fork.png" alt="Fork me on GitHub"/>
+    </a>
+    <footer>
+      <a title="The plugin which helps to organize a uniform but agile and easy documentation process." href="http://digimead.github.io/sbt-site-manager/">
+        Generated with SBT-Site-Manager
+      </a>
+      <span title="All content on this site is Copyright to Alexey Aksenov aka Ezh unless otherwise specified.">
+        © Alexey Aksenov
+      </span>
+    </footer>
+  </body>
+</html>
