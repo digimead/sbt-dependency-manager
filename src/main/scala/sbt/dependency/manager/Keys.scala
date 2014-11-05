@@ -30,7 +30,6 @@ object Keys {
   lazy val dependencyAdditionalArtifacts = TaskKey[Seq[(Option[java.io.File], Option[java.io.File])]]("dependencyAdditionalArtifacts", "Additional artifacts that are added to results.")
   lazy val dependencyFilter = TaskKey[Option[ModuleFilter]]("dependencyFilter", "Filter for project dependencies.")
   lazy val dependencyIgnoreConfigurations = SettingKey[Boolean]("dependencyIgnoreConfigurations", "Ignore configurations while lookup like 'test', for example.")
-  lazy val dependencyLookupClasspath = TaskKey[Classpath]("dependencyLookupClasspath", "Classpath that is used for building the dependency sequence.")
   lazy val dependencyOutput = SettingKey[Option[java.io.File]]("dependencyOutput", "Target directory for fetched artifacts. Fetch disabled if None.")
   lazy val dependencyOverwrite = SettingKey[Boolean]("dependencyOverwrite", "Overwrite exists artifacts.")
   lazy val dependencyPackPath = TaskKey[java.io.File]("dependencyPackPath", "Consolidated jar location.")

@@ -2,7 +2,7 @@
  * sbt-dependency-manager - fetch and merge byte code and source code jars, align broken sources within jars.
  * For example, it is allow easy source code lookup for IDE while developing SBT plugins (not only).
  *
- * Copyright (c) 2012-2013 Alexey Aksenov ezh@ezh.msk.ru
+ * Copyright (c) 2012-2014 Alexey Aksenov ezh@ezh.msk.ru
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,12 @@ package object manager {
     filter
   }
   /** Filter that accept only modules from libraryDependencies + dependencyLookupClasspath except Scala library. */
-  def DMFilterAcceptKnown = (libraryDependencies in Compile, libraryDependencies in Test, DMKey.dependencyLookupClasspath in DMConf) map {
-    (libraryDependenciesCompile, libraryDependenciesTest, dependencyLookupClasspath) ⇒
-      val acceptKnown = (dependencyLookupClasspath.flatMap(_.get(moduleID.key)) ++ libraryDependenciesCompile ++ libraryDependenciesTest).distinct.
-        foldLeft(moduleFilter(NothingFilter, NothingFilter, NothingFilter))((acc, m) ⇒ acc |
-          moduleFilter(GlobFilter(m.organization), GlobFilter(m.name), GlobFilter(m.revision)))
+  def DMFilterAcceptKnown = (libraryDependencies in DMConf, dependencyClasspath in DMConf) map {
+    (libraryDependencies, dependencyLookupClasspath) ⇒
+      val classpathModules = dependencyLookupClasspath.flatMap(_.get(moduleID.key))
+      val libraryModules = libraryDependencies.filterNot { m ⇒ classpathModules.exists(p ⇒ p.name == m.name && p.organization == m.organization && p.revision == m.revision) }
+      val acceptKnown = (classpathModules ++ libraryModules).foldLeft(moduleFilter(NothingFilter, NothingFilter, NothingFilter))((acc, m) ⇒ acc |
+        moduleFilter(GlobFilter(m.organization), GlobFilter(m.name), GlobFilter(m.revision)))
       val filter: Option[ModuleFilter] = Some(acceptKnown - moduleFilter(organization = GlobFilter("org.scala-lang"), name = GlobFilter("scala-library")))
       filter
   }
